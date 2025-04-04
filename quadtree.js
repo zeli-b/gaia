@@ -56,6 +56,52 @@ class Quadtree {
     return this;
   }
 
+  brush(x, y, radius, value, recurseLevel) {
+    if (recurseLevel <= 0)
+      return
+
+    if (recurseLevel === undefined)
+      recurseLevel = 10;
+
+    const luc = Math.hypot(x - 0, y - 0) < radius;
+    const ruc = Math.hypot(x - 1, y - 0) < radius;
+    const ldc = Math.hypot(x - 0, y - 1) < radius;
+    const rdc = Math.hypot(x - 1, y - 1) < radius;
+
+    if (![luc, ruc, ldc, rdc].some(i => i) && !this.hasPoint(x, y)) {
+      return this;
+    }
+
+    if ([luc, ruc, ldc, rdc].every(i => i)) {
+      this.value = value;
+      this.children = null;
+      return this;
+    }
+
+    if (!this.isDivided())
+      this.divide();
+
+    const nr = radius * 2;
+    const nlx = 2 * x - 0.25;
+    const nrx = 2 * x - 0.75;
+    const nuy = 2 * y - 0.25;
+    const ndy = 2 * y - 0.75;
+    this.children[0].brush(nlx, nuy, nr, value, --recurseLevel);
+    this.children[1].brush(nrx, nuy, nr, value, recurseLevel);
+    this.children[2].brush(nlx, ndy, nr, value, recurseLevel);
+    this.children[3].brush(nrx, ndy, nr, value, recurseLevel);
+
+    return this.reduce();
+  }
+
+  isHadInCircle(x, y, radius) {
+    return Math.hypot(x - 0.5, y - 0.5) < radius;
+  }
+
+  hasPoint(x, y) {
+    return 0 <= x && x < 1 && 0 <= y && y < 1;
+  }
+
   setChild(index, value) {
     if (!(value instanceof Quadtree))
       throw new Error("child of quadtree must instanceof quadtree");
@@ -102,22 +148,7 @@ function getQuadtreeFromJson(json) {
 
 if (require.main === module) {
   qt = new Quadtree(0);
-  console.log(qt.isDivided());
-  console.log(qt.getValue());
-  console.log(qt);
-
-  qt.divide();
-  console.log(qt.isDivided());
-  console.log(qt.getValue());
-  console.log(qt);
-
-  const json = qt.jsonify();
-  console.log(json);
-  const jqt = getQuadtreeFromJson(json);
-  console.log(jqt);
-
-  qt.reduce();
-  console.log(qt.isDivided());
-  console.log(qt.getValue());
-  console.log(qt);
+  qt.brush(0.748392746, 0.382647848, 0.1, 1);
+  console.log(JSON.stringify(qt.jsonify()));
+  console.log(qt.jsonify())
 }
