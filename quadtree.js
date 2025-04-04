@@ -56,7 +56,7 @@ class Quadtree {
     return this;
   }
 
-  brush(x, y, radius, value, recurseLevel) {
+  drawCircle(x, y, radius, value, recurseLevel) {
     if (recurseLevel <= 0)
       return
 
@@ -86,10 +86,10 @@ class Quadtree {
     const nrx = 2 * x - 1;
     const nuy = 2 * y;
     const ndy = 2 * y - 1;
-    this.children[0].brush(nlx, nuy, nr, value, --recurseLevel);
-    this.children[1].brush(nrx, nuy, nr, value, recurseLevel);
-    this.children[2].brush(nlx, ndy, nr, value, recurseLevel);
-    this.children[3].brush(nrx, ndy, nr, value, recurseLevel);
+    this.children[0].drawCircle(nlx, nuy, nr, value, --recurseLevel);
+    this.children[1].drawCircle(nrx, nuy, nr, value, recurseLevel);
+    this.children[2].drawCircle(nlx, ndy, nr, value, recurseLevel);
+    this.children[3].drawCircle(nrx, ndy, nr, value, recurseLevel);
 
     return this.reduce();
   }
@@ -148,11 +148,5 @@ function getQuadtreeFromJson(json) {
 
 if (require.main === module) {
   qt = new Quadtree(0);
-  /*
-  qt.brush(0.4748293764917, 0.538636288484737, 0.1, 1, 13);
-  qt.brush(0.5, 0.5, 0.1, 2, 13);
-  qt.brush(1.5, 0.5, 1, 1, 13);
-   */
-  qt.brush(0.5, 0.5, 0.5, 1);
   console.log(JSON.stringify(qt.jsonify(), null, 1));
 }
