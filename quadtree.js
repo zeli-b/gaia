@@ -249,6 +249,29 @@ class Quadtree {
     return 0 <= x && x < 1 && 0 <= y && y < 1;
   }
 
+  getValueProportion() {
+    if (!this.isDivided()) {
+      const proportionMap = {};
+      proportionMap[this.value] = 1.0;
+      return proportionMap;
+    }
+
+    const proportionMap = {};
+
+    this.children.forEach(child => {
+      const childProportions = child.getValueProportion();
+      for (const key in childProportions) {
+        if (proportionMap[key]) {
+          proportionMap[key] += childProportions[key] * 0.25;
+        } else {
+          proportionMap[key] = childProportions[key] * 0.25;
+        }
+      }
+    });
+
+    return proportionMap;
+  }
+
   setChild(index, value) {
     if (!(value instanceof Quadtree))
       throw new Error("child of quadtree must instanceof quadtree");
@@ -307,5 +330,6 @@ if (require.main === module) {
     [0.125, 0.3412],
     [0.3825, 0.3412]
   ], 1);
-  console.log(JSON.stringify(qt.jsonify(), null, 1));
+  // console.log(JSON.stringify(qt.jsonify(), null, 1));
+  console.log(qt.getValueProportion());
 }
