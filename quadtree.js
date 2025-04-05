@@ -1,3 +1,67 @@
+function isPolygonInsideSquare(points) {
+  for (const [x, y] of points) {
+    if (x < 0.0 || x > 1.0 || y < 0.0 || y > 1.0) {
+      return false; // 한 점이라도 정사각형 밖이면 false
+    }
+  }
+  return true; // 모든 점이 정사각형 내부
+}
+
+function isPointInPolygon(point, polygon) {
+  const [x, y] = point;
+  let inside = false;
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [xi, yi] = polygon[i];
+    const [xj, yj] = polygon[j];
+
+    const intersect =
+      yi > y !== yj > y &&
+      x < ((xj - xi) * (y - yi)) / (yj - yi + 0.00000001) + xi;
+
+    if (intersect) inside = !inside;
+  }
+
+  return inside;
+}
+
+function ccw(A, B, C) {
+  return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0]);
+}
+
+function segmentsIntersect(A, B, C, D) {
+  return ccw(A, C, D) !== ccw(B, C, D) && ccw(A, B, C) !== ccw(A, B, D);
+}
+
+function polygonIntersectsSquareBoundary(points) {
+  const square = [
+    [0.0, 0.0],
+    [1.0, 0.0],
+    [1.0, 1.0],
+    [0.0, 1.0]
+  ];
+
+  const squareEdges = [];
+  for (let i = 0; i < 4; i++) {
+    squareEdges.push([square[i], square[(i + 1) % 4]]);
+  }
+
+  const polyEdges = [];
+  for (let i = 0; i < points.length; i++) {
+    polyEdges.push([points[i], points[(i + 1) % points.length]]);
+  }
+
+  for (const [p1, p2] of polyEdges) {
+    for (const [q1, q2] of squareEdges) {
+      if (segmentsIntersect(p1, p2, q1, q2)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 function getMostFrequent(arr) {
   const hashmap = arr.reduce( (acc, val) => {
     acc[val] = (acc[val] || 0 ) + 1
@@ -139,6 +203,42 @@ class Quadtree {
     return this.reduce();
   }
 
+  drawPoly(points, value, recurseLevel) {
+    if (recurseLevel <= 0)
+      return;
+
+    if (recurseLevel === undefined) {
+      recurseLevel = 10;
+    }
+
+    // check if polygon border passes quadtree border
+    if (
+      !polygonIntersectsSquareBoundary(points)
+      && !isPolygonInsideSquare(points)
+    ) {
+      if (isPointInPolygon([0.5, 0.5], points)) {
+        this.value = value;
+        this.children = null;
+      }
+
+      return this;
+    }
+
+    if (!this.isDivided())
+      this.divide();
+
+    const lupoints = points.map(([x, y]) => [2 * x, 2 * y]);
+    const rupoints = points.map(([x, y]) => [2 * x - 1, 2 * y]);
+    const ldpoints = points.map(([x, y]) => [2 * x, 2 * y - 1]);
+    const rdpoints = points.map(([x, y]) => [2 * x - 1, 2 * y - 1]);
+    this.children[0].drawPoly(lupoints, value, --recurseLevel);
+    this.children[1].drawPoly(rupoints, value, recurseLevel);
+    this.children[2].drawPoly(ldpoints, value, recurseLevel);
+    this.children[3].drawPoly(rdpoints, value, recurseLevel);
+
+    return this.reduce();
+  }
+
   isHadInCircle(x, y, radius) {
     return Math.hypot(x - 0.5, y - 0.5) < radius;
   }
@@ -193,6 +293,17 @@ function getQuadtreeFromJson(json) {
 
 if (require.main === module) {
   qt = new Quadtree(0);
-  qt.drawRect(0.1, 0.2, 0.5, 0.5, 1);
+ qt.drawPoly([
+    [0.5, 0.1],
+    [0.6175, 0.3412],
+    [0.875, 0.3412],
+    [0.675, 0.5412],
+    [0.7587, 0.825],
+    [0.5, 0.66],
+    [0.2412, 0.825],
+    [0.325, 0.5412],
+    [0.125, 0.3412],
+    [0.3825, 0.3412]
+  ], 1);
   console.log(JSON.stringify(qt.jsonify(), null, 1));
 }
