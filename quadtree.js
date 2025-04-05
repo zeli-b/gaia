@@ -78,6 +78,7 @@ class Quadtree {
   constructor(value) {
     this.value = value;
     this.children = null;
+    this.isReduced = true;
   }
 
   isDivided() {
@@ -95,13 +96,17 @@ class Quadtree {
       new Quadtree(this.value),
     ];
 
+    this.isReduced = false;
+
     return this;
   }
 
   reduce() {
-    if (!this.isDivided()) {
+    if (this.isReduced)
       return;
-    }
+
+    if (!this.isDivided())
+      return;
 
     this.children.forEach(c => c.reduce());
 
@@ -118,6 +123,7 @@ class Quadtree {
 
     this.children = null;
     this.value = value.value;
+    this.isReduced = true;
 
     return this;
   }
