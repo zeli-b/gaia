@@ -1,4 +1,4 @@
-const DEFAULT_DEPTH = 10;
+const DEFAULT_DEPTH = 12;
 
 function getPolygonBoundingBox(points) {
   let minX = Infinity, maxX = -Infinity;
