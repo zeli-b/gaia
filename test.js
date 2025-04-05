@@ -1,4 +1,5 @@
 import { Quadtree } from "./quadtree.js";
+import { Project, Layer, Area, Structure } from "./project.js";
 
 function quadtreeTest1() {
   const qt = new Quadtree(0);
@@ -36,4 +37,41 @@ function quadtreeTest1() {
   console.log(JSON.stringify(qt.jsonify()));
 }
 
-quadtreeTest1();
+function projectTest1() {
+  // terrain
+  const bl = new Layer("Terrain");
+
+  const blaroc = new Area("Ocean", "blue");
+  bl.addArea(blaroc);
+  const blarla = new Area("Land", "green");
+  bl.addArea(blarla);
+
+  const blst1fig = new Quadtree(blaroc.id);
+  blst1fig.drawRect(0.5, 0.0, 1.0, 1.0, blarla.id);
+  const blst1 = new Structure(0, blst1fig);
+
+  bl.addStructure(blst1);
+
+  // country
+  const co = new Layer("Country");
+
+  const coarno = new Area("No Country", "grey");
+  co.addArea(coarno);
+  const coarza = new Area("Zasoque", "yellow");
+  co.addArea(coarza);
+
+  const cost1fig = new Quadtree(coarno.id);
+  cost1fig.drawRect(0.5, 0.0, 1.0, 0.5, coarza.id);
+  const cost1 = new Structure(0, cost1fig);
+  co.addStructure(cost1);
+
+  bl.addChildLayer(co);
+
+  // project
+  const pr = new Project("Sat Worldmap", bl);
+
+  console.log(pr);
+  console.log(pr.stringify());
+}
+
+projectTest1();

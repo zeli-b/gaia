@@ -2,6 +2,7 @@ export class Area {
   constructor(name, color) {
     this.name = name;
     this.color = color;
+    this.id = undefined;
   }
 }
 
@@ -19,6 +20,7 @@ export class Layer {
     this.areas = {}; // key: int (id), value: Area
     this.unaffected = unaffected;
     this.childLayers = [];
+    this.lastId = 0;
   }
 
   addStructure(structure) {
@@ -26,8 +28,9 @@ export class Layer {
     this.structures.sort((a, b) => a.startYear - b.startYear); // SortedList 효과
   }
 
-  addArea(id, area) {
-    this.areas[id] = area;
+  addArea(area) {
+    this.areas[++this.lastId] = area;
+    area.id = this.lastId;
   }
 
   addChildLayer(layer) {
@@ -41,8 +44,8 @@ export class Project {
     this.baseLayer = baseLayer;
   }
 
-  toJSON() {
-    return JSON.stringify(this);
+  stringify() {
+    return JSON.stringify(this, null, 1);
   }
 }
 
@@ -80,7 +83,4 @@ export function parseProject(json) {
 
   const baseLayer = parseLayer(data.baseLayer);
   return new Project(data.name, baseLayer);
-}
-
-if (require.main === module) {
 }

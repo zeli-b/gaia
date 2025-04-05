@@ -374,29 +374,29 @@ export class Quadtree {
     return getMostFrequent(children);
   }
 
-  jsonify() {
+  toJSON() {
     if (!this.isDivided()) {
       return this.value;
     }
 
     return [
-      this.children[0].jsonify(),
-      this.children[1].jsonify(),
-      this.children[2].jsonify(),
-      this.children[3].jsonify(),
+      this.children[0].toJSON(),
+      this.children[1].toJSON(),
+      this.children[2].toJSON(),
+      this.children[3].toJSON(),
     ];
   }
 }
 
-export function getQuadtreeFromJson(json) {
+export function parseQuadtree(json) {
   if (json instanceof Number || typeof json === "number") {
     return new Quadtree(json);
   }
 
   const result = new Quadtree(null).divide();
-  result.setChild(0, getQuadtreeFromJson(json[0]));
-  result.setChild(1, getQuadtreeFromJson(json[1]));
-  result.setChild(2, getQuadtreeFromJson(json[2]));
-  result.setChild(3, getQuadtreeFromJson(json[3]));
+  result.setChild(0, parseQuadtree(json[0]));
+  result.setChild(1, parseQuadtree(json[1]));
+  result.setChild(2, parseQuadtree(json[2]));
+  result.setChild(3, parseQuadtree(json[3]));
   return result;
 }
