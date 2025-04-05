@@ -52,6 +52,26 @@ function projectTest1() {
 
   bl.addStructure(blst1);
 
+  // weather
+  const we = new Layer("Weather");
+
+  const wearno = new Area("Good", "lightgrey");
+  we.addArea(wearno);
+  const wearza = new Area("Snow", "white");
+  we.addArea(wearza);
+
+  const west1fig = new Quadtree(wearno.id);
+  west1fig.drawRect(0.0, 0.0, 1.0, 0.5, wearza.id);
+  const west1 = new Structure(0, west1fig);
+  we.addStructure(west1);
+
+  const west2fig = new Quadtree(wearno.id);
+  west2fig.drawRect(0.25, 0.0, 0.75, 0.5, wearza.id);
+  const west2 = new Structure(1, west2fig);
+  we.addStructure(west2);
+
+  bl.addChildLayer(we);
+
   // country
   const co = new Layer("Country");
 
@@ -70,7 +90,6 @@ function projectTest1() {
   // project
   const pr = new Project("Sat Worldmap", bl);
 
-  console.log(pr);
   console.log(pr.stringify());
 }
 

@@ -1,0 +1,110 @@
+{
+ "name": "Sat Worldmap",
+ "baseLayer": {
+  "name": "Terrain",
+  "structures": [
+   {
+    "startYear": 0,
+    "figure": [
+     1,
+     2,
+     1,
+     2
+    ]
+   }
+  ],
+  "areas": {
+   "1": {
+    "name": "Ocean",
+    "color": "blue",
+    "id": 1
+   },
+   "2": {
+    "name": "Land",
+    "color": "green",
+    "id": 2
+   }
+  },
+  "unaffected": false,
+  "childLayers": [
+   {
+    "name": "Weather",
+    "structures": [
+     {
+      "startYear": 0,
+      "figure": [
+       2,
+       2,
+       1,
+       1
+      ]
+     },
+     {
+      "startYear": 1,
+      "figure": [
+       [
+        1,
+        2,
+        1,
+        2
+       ],
+       [
+        2,
+        1,
+        2,
+        1
+       ],
+       1,
+       1
+      ]
+     }
+    ],
+    "areas": {
+     "1": {
+      "name": "Good",
+      "color": "lightgrey",
+      "id": 1
+     },
+     "2": {
+      "name": "Snow",
+      "color": "white",
+      "id": 2
+     }
+    },
+    "unaffected": false,
+    "childLayers": [],
+    "lastId": 2
+   },
+   {
+    "name": "Country",
+    "structures": [
+     {
+      "startYear": 0,
+      "figure": [
+       1,
+       2,
+       1,
+       1
+      ]
+     }
+    ],
+    "areas": {
+     "1": {
+      "name": "No Country",
+      "color": "grey",
+      "id": 1
+     },
+     "2": {
+      "name": "Zasoque",
+      "color": "yellow",
+      "id": 2
+     }
+    },
+    "unaffected": false,
+    "childLayers": [],
+    "lastId": 2
+   }
+  ],
+  "lastId": 2
+ }
+}
