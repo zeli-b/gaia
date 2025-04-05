@@ -94,6 +94,51 @@ class Quadtree {
     return this.reduce();
   }
 
+  drawRect(x1, y1, x2, y2, value, recurseLevel) {
+    if (recurseLevel <= 0)
+      return
+
+    if (recurseLevel === undefined) {
+      recurseLevel = 10;
+    }
+
+    const luc = x1 <= 0 && 0 < x2 && y1 <= 0 && 0 < y2;
+    const ruc = x1 <= 1 && 1 < x2 && y1 <= 0 && 0 < y2;
+    const ldc = x1 <= 0 && 0 < x2 && y1 <= 1 && 1 < y2;
+    const rdc = x1 <= 1 && 1 < x2 && y1 <= 1 && 1 < y2;
+
+    if ([luc, ruc, ldc, rdc].every(i => i)) {
+      this.value = value;
+      this.children = null;
+      return this;
+    }
+
+    const ol = Math.max(x1, x2) < 0;
+    const or = Math.min(x1, x2) >= 1;
+    const ou = Math.max(y1, y2) < 0;
+    const od = Math.min(y1, y2) >= 1;
+    if ([ol, or, ou, od].every(i => i))
+      return this;
+
+    if (!this.isDivided())
+      this.divide();
+
+    const nlx1 = 2 * x1;
+    const nlx2 = 2 * x2;
+    const nrx1 = 2 * x1 - 1;
+    const nrx2 = 2 * x2 - 1;
+    const nuy1 = 2 * y1;
+    const nuy2 = 2 * y2;
+    const ndy1 = 2 * y1 - 1;
+    const ndy2 = 2 * y2 - 1;
+    this.children[0].drawRect(nlx1, nuy1, nlx2, nuy2, value, --recurseLevel);
+    this.children[1].drawRect(nrx1, nuy1, nrx2, nuy2, value, recurseLevel);
+    this.children[2].drawRect(nlx1, ndy1, nlx2, ndy2, value, recurseLevel);
+    this.children[3].drawRect(nrx1, ndy1, nrx2, ndy2, value, recurseLevel);
+
+    return this.reduce();
+  }
+
   isHadInCircle(x, y, radius) {
     return Math.hypot(x - 0.5, y - 0.5) < radius;
   }
@@ -148,5 +193,6 @@ function getQuadtreeFromJson(json) {
 
 if (require.main === module) {
   qt = new Quadtree(0);
+  qt.drawRect(0.1, 0.2, 0.5, 0.5, 1);
   console.log(JSON.stringify(qt.jsonify(), null, 1));
 }
