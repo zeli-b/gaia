@@ -9,7 +9,7 @@ export class Area {
 export class Structure {
   constructor(startYear, figure) {
     this.startYear = startYear;
-    this.figure = figure;  // 예: { type: "Quadtree", nodes: {...} }
+    this.figure = figure;
   }
 }
 
@@ -26,7 +26,7 @@ export class Layer {
 
   addStructure(structure) {
     this.structures.push(structure);
-    this.structures.sort((a, b) => a.startYear - b.startYear); // SortedList 효과
+    this.structures.sort((a, b) => a.startYear - b.startYear);
   }
 
   addArea(area) {

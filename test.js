@@ -42,9 +42,9 @@ function quadtreeTest2() {
   qt.drawCircle(0.5, 0.5, 0.5, 1);
 
   const qf = new Quadtree(1);
-  qf.drawCircle(1.0, 0.5, 0.5, 0);
+  // qf.drawCircle(1.0, 0.5, 0.5, 0);
 
-  qt.multiply(qf, 0);
+  qt.mask(qf, 0);
 
   console.log(JSON.stringify(qt.toJSON()));
 }
