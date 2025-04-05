@@ -37,6 +37,20 @@ function quadtreeTest1() {
   console.log(JSON.stringify(qt.jsonify()));
 }
 
+function quadtreeTest2() {
+  const qt = new Quadtree(0);
+  qt.drawCircle(0.5, 0.5, 0.5, 1);
+
+  const qf = new Quadtree(1);
+  qf.drawCircle(1.0, 0.5, 0.5, 0);
+
+  qt.multiply(qf, 0);
+
+  console.log(JSON.stringify(qt.toJSON()));
+}
+
+quadtreeTest2();
+
 function projectTest1() {
   // terrain
   const bl = new Layer("Terrain");
@@ -92,5 +106,3 @@ function projectTest1() {
 
   console.log(pr.stringify());
 }
-
-projectTest1();

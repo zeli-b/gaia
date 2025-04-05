@@ -1,5 +1,26 @@
 const DEFAULT_DEPTH = 12;
 
+function pointToRectDistance(x, y) {
+  const xmin = 0.0, ymin = 0.0;
+  const xmax = 1.0, ymax = 1.0;
+
+  let dx = 0.0;
+  if (x < xmin) {
+    dx = xmin - x;
+  } else if (x > xmax) {
+    dx = x - xmax;
+  }
+
+  let dy = 0.0;
+  if (y < ymin) {
+    dy = ymin - y;
+  } else if (y > ymax) {
+    dy = y - ymax;
+  }
+
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 function getPolygonBoundingBox(points) {
   let minX = Infinity, maxX = -Infinity;
   let minY = Infinity, maxY = -Infinity;
@@ -165,7 +186,8 @@ export class Quadtree {
     const ldc = Math.hypot(x - 0, y - 1) < radius;
     const rdc = Math.hypot(x - 1, y - 1) < radius;
 
-    if (![luc, ruc, ldc, rdc].some(i => i) && !this.hasPoint(x, y)) {
+    const distance = pointToRectDistance(x, y);
+    if (distance > radius) {
       return this;
     }
 
@@ -312,6 +334,27 @@ export class Quadtree {
     this.children[1].drawPoly(rupoints, value, recurseLevel - 1, ruBox);
     this.children[2].drawPoly(ldpoints, value, recurseLevel - 1, ldBox);
     this.children[3].drawPoly(rdpoints, value, recurseLevel - 1, rdBox);
+
+    return this.reduce();
+  }
+
+  multiply(binaryQuadtree, fallbackValue) {
+    if (!binaryQuadtree.isDivided()) {
+      if (binaryQuadtree.value === 0) {
+        this.value = fallbackValue;
+        this.children = null;
+        return this;
+      }
+
+      return this;
+    }
+
+    if (!this.isDivided())
+      this.divide();
+
+    for (let i = 0; i < 4; i++) {
+      this.children[i].multiply(binaryQuadtree.children[i], fallbackValue);
+    }
 
     return this.reduce();
   }
