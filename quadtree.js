@@ -1,3 +1,5 @@
+const DEFAULT_DEPTH = 12;
+
 function isPolygonInsideSquare(points) {
   for (const [x, y] of points) {
     if (x < 0.0 || x > 1.0 || y < 0.0 || y > 1.0) {
@@ -125,7 +127,7 @@ class Quadtree {
       return
 
     if (recurseLevel === undefined)
-      recurseLevel = 10;
+      recurseLevel = DEFAULT_DEPTH;
 
     const luc = Math.hypot(x - 0, y - 0) < radius;
     const ruc = Math.hypot(x - 1, y - 0) < radius;
@@ -163,7 +165,7 @@ class Quadtree {
       return
 
     if (recurseLevel === undefined) {
-      recurseLevel = 10;
+      recurseLevel = DEFAULT_DEPTH;
     }
 
     const luc = x1 <= 0 && 0 < x2 && y1 <= 0 && 0 < y2;
@@ -208,7 +210,7 @@ class Quadtree {
       return;
 
     if (recurseLevel === undefined) {
-      recurseLevel = 10;
+      recurseLevel = DEFAULT_DEPTH;
     }
 
     // check if polygon border passes quadtree border
