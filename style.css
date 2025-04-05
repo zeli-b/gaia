@@ -21,6 +21,11 @@ body {
     background-color: lightgrey;
 }
 
+.canvas {
+    width: 100%;
+    height: 100%;
+}
+
 .properties {
     min-width: 200px;
 }
