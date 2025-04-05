@@ -21,7 +21,7 @@ export class Layer {
     this.unaffected = unaffected;
     this.childLayers = [];
     this.lastId = 0;
-    this.parentAreaIds = parentAreaIds;
+    this.parentAreaIds = parentAreaIds ? parentAreaIds : [];
   }
 
   addStructure(structure) {
