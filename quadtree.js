@@ -1,4 +1,29 @@
-const DEFAULT_DEPTH = 12;
+const DEFAULT_DEPTH = 10;
+
+function getPolygonBoundingBox(points) {
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+
+  for (const [x, y] of points) {
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+
+  return { x1: minX, y1: minY, x2: maxX, y2: maxY };
+}
+
+function normalizeProportion(obj) {
+  const total = Object.values(obj).reduce((sum, val) => sum + val, 0);
+  if (total === 0) return obj; // or handle edge case differently
+
+  const result = {};
+  for (const key in obj) {
+    result[key] = obj[key] / total;
+  }
+  return result;
+}
 
 function isPolygonInsideSquare(points) {
   for (const [x, y] of points) {
@@ -174,27 +199,25 @@ class Quadtree {
       recurseLevel = DEFAULT_DEPTH;
     }
 
-    const luc = x1 <= 0 && 0 < x2 && y1 <= 0 && 0 < y2;
-    const ruc = x1 <= 1 && 1 < x2 && y1 <= 0 && 0 < y2;
-    const ldc = x1 <= 0 && 0 < x2 && y1 <= 1 && 1 < y2;
-    const rdc = x1 <= 1 && 1 < x2 && y1 <= 1 && 1 < y2;
+    if (x1 > x2) [x1, x2] = [x2, x1];
+    if (y1 > y2) [y1, y2] = [y2, y1];
 
-    if ([luc, ruc, ldc, rdc].every(i => i)) {
+    // 사각형이 셀을 완전히 포함하면 즉시 채움
+    if (x1 <= 0 && x2 >= 1 && y1 <= 0 && y2 >= 1) {
       this.value = value;
       this.children = null;
       return this;
     }
 
-    const ol = Math.max(x1, x2) < 0;
-    const or = Math.min(x1, x2) >= 1;
-    const ou = Math.max(y1, y2) < 0;
-    const od = Math.min(y1, y2) >= 1;
-    if ([ol, or, ou, od].every(i => i))
+    // 사각형과 셀 겹침이 없으면 탈출
+    if (x2 < 0 || x1 > 1 || y2 < 0 || y1 > 1) {
       return this;
+    }
 
     if (!this.isDivided())
       this.divide();
 
+    recurseLevel--;
     const nlx1 = 2 * x1;
     const nlx2 = 2 * x2;
     const nrx1 = 2 * x1 - 1;
@@ -203,7 +226,7 @@ class Quadtree {
     const nuy2 = 2 * y2;
     const ndy1 = 2 * y1 - 1;
     const ndy2 = 2 * y2 - 1;
-    this.children[0].drawRect(nlx1, nuy1, nlx2, nuy2, value, --recurseLevel);
+    this.children[0].drawRect(nlx1, nuy1, nlx2, nuy2, value, recurseLevel);
     this.children[1].drawRect(nrx1, nuy1, nrx2, nuy2, value, recurseLevel);
     this.children[2].drawRect(nlx1, ndy1, nlx2, ndy2, value, recurseLevel);
     this.children[3].drawRect(nrx1, ndy1, nrx2, ndy2, value, recurseLevel);
@@ -211,7 +234,7 @@ class Quadtree {
     return this.reduce();
   }
 
-  drawPoly(points, value, recurseLevel) {
+  drawPoly(points, value, recurseLevel, boundingBox) {
     if (recurseLevel <= 0)
       return;
 
@@ -219,7 +242,21 @@ class Quadtree {
       recurseLevel = DEFAULT_DEPTH;
     }
 
-    // check if polygon border passes quadtree border
+    // AABB 계산 및 교차 여부 판단
+    if (boundingBox === undefined) {
+      boundingBox = getPolygonBoundingBox(points);
+    }
+
+    const cellBox = { x1: 0, y1: 0, x2: 1, y2: 1 };
+
+    // AABB 충돌 없으면 바로 탈출
+    if (
+      boundingBox.x2 < cellBox.x1 || boundingBox.x1 > cellBox.x2 ||
+      boundingBox.y2 < cellBox.y1 || boundingBox.y1 > cellBox.y2
+    ) {
+      return this;
+    }
+
     if (
       !polygonIntersectsSquareBoundary(points)
       && !isPolygonInsideSquare(points)
@@ -228,21 +265,53 @@ class Quadtree {
         this.value = value;
         this.children = null;
       }
-
       return this;
     }
 
     if (!this.isDivided())
       this.divide();
 
-    const lupoints = points.map(([x, y]) => [2 * x, 2 * y]);
-    const rupoints = points.map(([x, y]) => [2 * x - 1, 2 * y]);
-    const ldpoints = points.map(([x, y]) => [2 * x, 2 * y - 1]);
-    const rdpoints = points.map(([x, y]) => [2 * x - 1, 2 * y - 1]);
-    this.children[0].drawPoly(lupoints, value, --recurseLevel);
-    this.children[1].drawPoly(rupoints, value, recurseLevel);
-    this.children[2].drawPoly(ldpoints, value, recurseLevel);
-    this.children[3].drawPoly(rdpoints, value, recurseLevel);
+    const lupoints = [], rupoints = [], ldpoints = [], rdpoints = [];
+    for (let i = 0; i < points.length; i++) {
+      const [x, y] = points[i];
+      lupoints.push([2 * x, 2 * y]);
+      rupoints.push([2 * x - 1, 2 * y]);
+      ldpoints.push([2 * x, 2 * y - 1]);
+      rdpoints.push([2 * x - 1, 2 * y - 1]);
+    }
+
+    const luBox = {
+      x1: 2 * boundingBox.x1,
+      y1: 2 * boundingBox.y1,
+      x2: 2 * boundingBox.x2,
+      y2: 2 * boundingBox.y2
+    };
+
+    const ruBox = {
+      x1: 2 * boundingBox.x1 - 1,
+      y1: 2 * boundingBox.y1,
+      x2: 2 * boundingBox.x2 - 1,
+      y2: 2 * boundingBox.y2
+    };
+
+    const ldBox = {
+      x1: 2 * boundingBox.x1,
+      y1: 2 * boundingBox.y1 - 1,
+      x2: 2 * boundingBox.x2,
+      y2: 2 * boundingBox.y2 - 1
+    };
+
+    const rdBox = {
+      x1: 2 * boundingBox.x1 - 1,
+      y1: 2 * boundingBox.y1 - 1,
+      x2: 2 * boundingBox.x2 - 1,
+      y2: 2 * boundingBox.y2 - 1
+    };
+
+    this.children[0].drawPoly(lupoints, value, recurseLevel - 1, luBox);
+    this.children[1].drawPoly(rupoints, value, recurseLevel - 1, ruBox);
+    this.children[2].drawPoly(ldpoints, value, recurseLevel - 1, ldBox);
+    this.children[3].drawPoly(rdpoints, value, recurseLevel - 1, rdBox);
 
     return this.reduce();
   }
@@ -255,7 +324,16 @@ class Quadtree {
     return 0 <= x && x < 1 && 0 <= y && y < 1;
   }
 
-  getValueProportion() {
+  getValueProportion(recurseLevel) {
+    if (recurseLevel <= 0) {
+      const proportionMap = {};
+      proportionMap[this.getValue()] = 1.0;
+      return proportionMap;
+    }
+
+    if (recurseLevel === undefined)
+      recurseLevel = DEFAULT_DEPTH;
+
     if (!this.isDivided()) {
       const proportionMap = {};
       proportionMap[this.value] = 1.0;
@@ -264,8 +342,9 @@ class Quadtree {
 
     const proportionMap = {};
 
+    recurseLevel--;
     this.children.forEach(child => {
-      const childProportions = child.getValueProportion();
+      const childProportions = child.getValueProportion(recurseLevel);
       for (const key in childProportions) {
         if (proportionMap[key]) {
           proportionMap[key] += childProportions[key] * 0.25;
@@ -275,7 +354,7 @@ class Quadtree {
       }
     });
 
-    return proportionMap;
+    return normalizeProportion(proportionMap);
   }
 
   setChild(index, value) {
@@ -323,8 +402,13 @@ function getQuadtreeFromJson(json) {
 }
 
 if (require.main === module) {
-  qt = new Quadtree(0);
- qt.drawPoly([
+ const qt = new Quadtree(0);
+
+  // 7. 전체 배경 텍스처 느낌의 큰 원 (value: 2)
+  qt.drawCircle(0.5, 0.5, 0.5, 1);
+
+  // 1. 별 모양 중앙 (value: 1)
+  qt.drawPoly([
     [0.5, 0.1],
     [0.6175, 0.3412],
     [0.875, 0.3412],
@@ -335,7 +419,20 @@ if (require.main === module) {
     [0.325, 0.5412],
     [0.125, 0.3412],
     [0.3825, 0.3412]
-  ], 1);
-  // console.log(JSON.stringify(qt.jsonify(), null, 1));
-  console.log(qt.getValueProportion());
+  ], 2);
+
+  qt.drawCircle(0.2, 0.2, 0.15, 3);
+
+  qt.drawRect(0.75, 0.75, 0.95, 0.95, 4);
+
+  // 4. 중심에 겹쳐지는 작은 원 (value: 2)
+  qt.drawCircle(0.5, 0.5, 0.15, 5);
+
+  // 5. 좌하단 장식용 직사각형 (value: 1)
+  qt.drawRect(0.05, 0.8, 0.2, 0.95, 6);
+
+  // 6. 우상단 큰 원 (value: 3)
+  qt.drawCircle(0.8, 0.2, 0.18, 7);
+
+  console.log(JSON.stringify(qt.jsonify()));
 }
