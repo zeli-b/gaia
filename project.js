@@ -14,13 +14,14 @@ export class Structure {
 }
 
 export class Layer {
-  constructor(name, unaffected = false) {
+  constructor(name, unaffected = false, parentAreaId = null) {
     this.name = name;
     this.structures = [];
     this.areas = {}; // key: int (id), value: Area
     this.unaffected = unaffected;
     this.childLayers = [];
     this.lastId = 0;
+    this.parentAreaId = parentAreaId;
   }
 
   addStructure(structure) {
