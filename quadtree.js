@@ -338,7 +338,7 @@ export class Quadtree {
     return this.reduce();
   }
 
-  multiply(binaryQuadtree, fallbackValue) {
+  mask(binaryQuadtree, fallbackValue) {
     if (!binaryQuadtree.isDivided()) {
       if (binaryQuadtree.value === 0) {
         this.value = fallbackValue;
@@ -353,7 +353,7 @@ export class Quadtree {
       this.divide();
 
     for (let i = 0; i < 4; i++) {
-      this.children[i].multiply(binaryQuadtree.children[i], fallbackValue);
+      this.children[i].mask(binaryQuadtree.children[i], fallbackValue);
     }
 
     return this.reduce();
