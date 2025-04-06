@@ -125,9 +125,11 @@ function projectTest1() {
  * 프로젝트 불러오기 테스트
  */
 function projectTest2() {
-  fs.readFile("output1.json", "utf-8", (err, data) => {
+  fs.readFile("./tmp/output1.json", "utf-8", (err, data) => {
     const pr = parseProject(data);
     console.log(pr.stringify());
+
+    console.log(pr.baseLayer.structures[0].figure);
   })
 }
 
