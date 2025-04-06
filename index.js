@@ -15,11 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas = document.querySelector("#canvas");
   ctx = canvas.getContext('2d');
 
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  canvas.width = canvas.clientWidth * window.devicePixelRatio;
+  canvas.height = canvas.clientHeight * window.devicePixelRatio;
   canvas.addEventListener("resize", e => {
-    e.target.width = e.target.clientWidth;
-    e.target.height = e.target.clientHeught;
+    e.target.width = e.target.clientWidth * window.devicePixelRatio;
+    e.target.height = e.target.clientHeight * window.devicePixelRatio;
 
     processFrame();
   });
