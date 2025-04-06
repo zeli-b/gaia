@@ -103,6 +103,7 @@ export class Project {
   constructor(name, baseLayer) {
     this.name = name;
     this.baseLayer = baseLayer;
+    this.gaiaVersion = 1;
   }
 
   /**
