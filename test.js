@@ -1,5 +1,7 @@
+import fs from "fs";
+
 import { Quadtree } from "./quadtree.js";
-import { Project, Layer, Area, Structure } from "./project.js";
+import { parseProject, Project, Layer, Area, Structure } from "./project.js";
 
 /**
  * 쿼드트리 테스트 1
@@ -58,8 +60,6 @@ function quadtreeTest2() {
 
   console.log(JSON.stringify(qt.toJSON()));
 }
-
-quadtreeTest2();
 
 /**
  * 프로젝트 전체 테스트
@@ -120,3 +120,15 @@ function projectTest1() {
 
   console.log(pr.stringify());
 }
+
+/**
+ * 프로젝트 불러오기 테스트
+ */
+function projectTest2() {
+  fs.readFile("output.json", "utf-8", (err, data) => {
+    const pr = parseProject(data);
+    console.log(pr.stringify());
+  })
+}
+
+projectTest2();

@@ -114,30 +114,32 @@ export function parseProject(json) {
   const data = typeof json === 'string' ? JSON.parse(json) : json;
 
   function parseArea(areaData) {
-    return new Area(areaData.name, areaData.color);
+    const area = new Area(areaData.name, areaData.color);
+    area.id = areaData.id;
+    return area;
   }
 
   function parseStructure(structureData) {
-    return new Structure(
-      structureData.startYear,
-      parseQuadtree(structureData.figure)
-    );
+    return new Structure(structureData.startYear, structureData.figure);
   }
 
   function parseLayer(layerData) {
-    const layer = new Layer(layerData.name, layerData.unaffected);
+    const layer = new Layer(layerData.name, layerData.unaffected, layerData.parentAreaIds);
+    layer.lastId = layerData.lastId;
 
-    // 영역 파싱
-    for (const [id, area] of Object.entries(layerData.areas)) {
-      layer.addArea(Number(id), parseArea(area)); // 문제 있음: addArea는 id를 넘기지 않음
+    // areas: Dictionary<int, Area>
+    for (const [id, areaData] of Object.entries(layerData.areas)) {
+      const area = parseArea(areaData);
+      area.id = Number(id);
+      layer.areas[area.id] = area;
     }
 
-    // 구조체 파싱
+    // structures: List<Structure>
     for (const struct of layerData.structures) {
       layer.addStructure(parseStructure(struct));
     }
 
-    // 자식 레이어 파싱
+    // childLayers: List<Layer>
     for (const child of layerData.childLayers) {
       layer.addChildLayer(parseLayer(child));
     }
