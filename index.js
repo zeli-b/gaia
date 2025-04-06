@@ -41,8 +41,14 @@ function tick() {
  */
 function render() {
   // 배경 색 칠
-  ctx.fillStyle = "#5C94B3";
+  ctx.fillStyle = "lightgrey";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "grey";
+  for (let x = 0; x < canvas.width; x += 20)
+    for (let y = 0; y < canvas.height; y += 20) {
+      ctx.fillRect(x, y, 10, 10);
+      ctx.fillRect(x + 10, y + 10, 10, 10);
+    }
 }
 
 /**
