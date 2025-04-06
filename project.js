@@ -2,6 +2,10 @@ import { parseQuadtree } from "./quadtree.js";
 
 /**
  * 영역(Area)을 나타내는 클래스
+ *
+ * 영역은 name과 color, id로 이루어져 있으며
+ * id는 레이어에 등록될 때에 자동으로 부여된다.
+ * 즉, 영역은 구조체를 이루기 전에 레이어에 등록되어야 한다.
  */
 export class Area {
   /**
@@ -17,6 +21,11 @@ export class Area {
 
 /**
  * 구조체(Structure)를 나타내는 클래스
+ *
+ * 구조체는 시간선상의 지도를 나타낸다.
+ * startYear는 아벨리카력으로 시간을 나타내고,
+ * figure은 Quadtree 오브젝트이다:
+ * figure은 값으로 영역의 id를 참조한다.
  */
 export class Structure {
   /**
