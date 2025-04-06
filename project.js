@@ -29,6 +29,10 @@ export class Layer {
     this.structures.sort((a, b) => a.startYear - b.startYear);
   }
 
+  getLastStructure() {
+    return self.structures[self.structures.length - 1];
+  }
+
   addArea(area) {
     this.areas[++this.lastId] = area;
     area.id = this.lastId;
