@@ -1,6 +1,10 @@
 import { Quadtree } from "./quadtree.js";
 import { Project, Layer, Area, Structure } from "./project.js";
 
+/**
+ * 쿼드트리 테스트 1
+ * - 여러 모양을 쿼드트리에 그림
+ */
 function quadtreeTest1() {
   const qt = new Quadtree(0);
 
@@ -21,38 +25,48 @@ function quadtreeTest1() {
     [0.3825, 0.3412]
   ], 2);
 
+  // 2. 좌측 하단 원 (value: 3)
   qt.drawCircle(0.2, 0.2, 0.15, 3);
 
+  // 3. 우측 하단 직사각형 (value: 4)
   qt.drawRect(0.75, 0.75, 0.95, 0.95, 4);
 
-  // 4. 중심에 겹쳐지는 작은 원 (value: 2)
+  // 4. 중심에 겹쳐지는 작은 원 (value: 5)
   qt.drawCircle(0.5, 0.5, 0.15, 5);
 
-  // 5. 좌하단 장식용 직사각형 (value: 1)
+  // 5. 좌하단 장식용 직사각형 (value: 6)
   qt.drawRect(0.05, 0.8, 0.2, 0.95, 6);
 
-  // 6. 우상단 큰 원 (value: 3)
+  // 6. 우상단 큰 원 (value: 7)
   qt.drawCircle(0.8, 0.2, 0.18, 7);
 
   console.log(JSON.stringify(qt.jsonify()));
 }
 
+/**
+ * 쿼드트리 테스트 2
+ * - 두 개의 원을 그린 후 겹침 제거
+ */
 function quadtreeTest2() {
   const qt = new Quadtree(0);
-  qt.drawCircle(0.5, 0.5, 0.5, 1);
+  qt.drawCircle(0.5, 0.5, 0.4, 1);
 
-  const qf = new Quadtree(2);
-  qf.drawCircle(1.0, 0.5, 0.5, 0);
+  const qf = new Quadtree(0);
+  qf.drawCircle(1.0, 0.5, 0.5, 2);
 
-  qt.overlap(qf);
+  qt.excludeOverlap(qf, 3);
 
   console.log(JSON.stringify(qt.toJSON()));
 }
 
 quadtreeTest2();
 
+/**
+ * 프로젝트 전체 테스트
+ * - 지형, 날씨, 국가 레이어 구성 및 구조체 생성
+ */
 function projectTest1() {
-  // terrain
+  // 지형 레이어
   const bl = new Layer("Terrain");
 
   const blaroc = new Area("Ocean", "blue");
@@ -66,7 +80,7 @@ function projectTest1() {
 
   bl.addStructure(blst1);
 
-  // weather
+  // 날씨 레이어
   const we = new Layer("Weather");
 
   const wearno = new Area("Good", "lightgrey");
@@ -86,7 +100,7 @@ function projectTest1() {
 
   bl.addChildLayer(we);
 
-  // country
+  // 국가 레이어
   const co = new Layer("Country");
 
   const coarno = new Area("No Country", "grey");
@@ -101,7 +115,7 @@ function projectTest1() {
 
   bl.addChildLayer(co);
 
-  // project
+  // 프로젝트 생성
   const pr = new Project("Sat Worldmap", bl);
 
   console.log(pr.stringify());
