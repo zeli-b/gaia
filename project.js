@@ -120,7 +120,10 @@ export function parseProject(json) {
   }
 
   function parseStructure(structureData) {
-    return new Structure(structureData.startYear, structureData.figure);
+    return new Structure(
+      structureData.startYear,
+      parseQuadtree(structureData.figure)
+    );
   }
 
   function parseLayer(layerData) {
