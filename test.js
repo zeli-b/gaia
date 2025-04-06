@@ -41,10 +41,10 @@ function quadtreeTest2() {
   const qt = new Quadtree(0);
   qt.drawCircle(0.5, 0.5, 0.5, 1);
 
-  const qf = new Quadtree(1);
-  // qf.drawCircle(1.0, 0.5, 0.5, 0);
+  const qf = new Quadtree(2);
+  qf.drawCircle(1.0, 0.5, 0.5, 0);
 
-  qt.mask(qf, 0);
+  qt.overlap(qf);
 
   console.log(JSON.stringify(qt.toJSON()));
 }

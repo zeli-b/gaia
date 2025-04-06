@@ -338,9 +338,9 @@ export class Quadtree {
     return this.reduce();
   }
 
-  mask(binaryQuadtree, fallbackValue) {
+  mask(binaryQuadtree, fallbackValue, isZero = v => v === 0) {
     if (!binaryQuadtree.isDivided()) {
-      if (binaryQuadtree.value === 0) {
+      if (isZero(binaryQuadtree.value)) {
         this.value = fallbackValue;
         this.children = null;
         return this;
@@ -353,7 +353,28 @@ export class Quadtree {
       this.divide();
 
     for (let i = 0; i < 4; i++) {
-      this.children[i].mask(binaryQuadtree.children[i], fallbackValue);
+      this.children[i].mask(binaryQuadtree.children[i], fallbackValue, isZero);
+    }
+
+    return this.reduce();
+  }
+
+  overlap(binaryQuadtree, isZero = v => v === 0) {
+    if (!binaryQuadtree.isDivided()) {
+      if (isZero(binaryQuadtree.value)) {
+        return;
+      }
+
+      this.value = binaryQuadtree.value;
+      this.children = null;
+      return this;
+    }
+
+    if (!this.isDivided())
+      this.divide();
+
+    for (let i = 0; i < 4; i++) {
+      this.children[i].overlap(binaryQuadtree.children[i], isZero);
     }
 
     return this.reduce();
