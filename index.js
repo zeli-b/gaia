@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   canvas.width = canvas.clientWidth * window.devicePixelRatio;
   canvas.height = canvas.clientHeight * window.devicePixelRatio;
-  canvas.addEventListener("resize", e => {
+  window.addEventListener("resize", e => {
+    canvas.width = 0;
+    canvas.height = 0;
     canvas.width = canvas.clientWidth * window.devicePixelRatio;
     canvas.height = canvas.clientHeight * window.devicePixelRatio;
 
@@ -37,7 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const read = new FileReader();
       read.readAsBinaryString(file);
       read.onloadend = () => {
-        window.project = parseProject(read.result);
+        const project = parseProject(read.result);
+        loadProject(project);
         processFrame();
       }
     };
@@ -47,6 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // 한프레임 처리
   processFrame();
 });
+
+/**
+ * 프로젝트를 적용
+ * @param {Project} project - 불러올 프로젝트
+ */
+function loadProject(project) {
+  window.project = project;
+}
 
 /**
  * 계산 등 화면 렌더링에 필요한 부수적인 것들을
@@ -70,6 +81,7 @@ function render() {
       ctx.fillRect(x + 10, y + 10, 10, 10);
     }
 
+  // render project
   window.project.render(canvas, ctx, window.camera);
 }
 
@@ -82,3 +94,4 @@ function processFrame() {
   tick();
   render();
 }
+window.processFrame = processFrame;

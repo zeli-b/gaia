@@ -532,16 +532,17 @@ export class Quadtree {
    render(areas, canvas, context, camera, depth = 0, dx = 0, dy = 0) {
     const size = camera.zoom / Math.pow(2, depth);
     if (!this.isDivided()) {
-      const x = camera.convertMapToScreenX(dx, canvas);
-      const y = camera.convertMapToScreenY(dy, canvas);
+      const x = camera.convertMapToScreenX(canvas, dx);
+      const y = camera.convertMapToScreenY(canvas, dy);
       const color = areas[this.value].color;
 
       context.fillStyle = color;
       context.fillRect(x, y, size, size);
+      console.log(dx, dy, x, y, size, color);
       return this;
     }
 
-    const half = size / 2;
+    const half = 0.5 / Math.pow(2, depth);
     this.children[0].render(
       areas, canvas, context, camera, depth+1, dx, dy
     );
