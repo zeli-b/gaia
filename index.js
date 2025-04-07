@@ -10,7 +10,7 @@ window.Structure = Structure;
 let canvas;
 let ctx;
 window.project = new Project("Untitled", new Layer("Layer 1"));
-window.camera = new Camera(0.0, 0.0, 1.0);
+window.camera = new Camera(0.5, 0.5, 1000.0);
 
 document.addEventListener("DOMContentLoaded", () => {
   // canvas 불러오기 및 이벤트 추가
