@@ -1,5 +1,6 @@
 import { Quadtree } from "./quadtree.js";
 import { Area, Layer, Structure, Project } from "./project.js";
+import { Camera } from "./camera.js";
 
 window.Quadtree = Quadtree;
 window.Area = Area;
@@ -9,6 +10,7 @@ window.Structure = Structure;
 let canvas;
 let ctx;
 window.project = new Project("Untitled", new Layer("Layer 1"));
+window.camera = new Camera(0.0, 0.0, 1.0);
 
 document.addEventListener("DOMContentLoaded", () => {
   // canvas 불러오기 및 이벤트 추가
@@ -17,9 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   canvas.width = canvas.clientWidth * window.devicePixelRatio;
   canvas.height = canvas.clientHeight * window.devicePixelRatio;
-  canvas.addEventListener("resize", e => {
-    e.target.width = e.target.clientWidth * window.devicePixelRatio;
-    e.target.height = e.target.clientHeight * window.devicePixelRatio;
+  window.addEventListener("resize", e => {
+    canvas.width = canvas.clientWidth * window.devicePixelRatio;
+    canvas.height = canvas.clientHeight * window.devicePixelRatio;
 
     processFrame();
   });
