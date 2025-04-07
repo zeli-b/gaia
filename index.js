@@ -1,5 +1,5 @@
 import { Quadtree } from "./quadtree.js";
-import { Area, Layer, Structure, Project } from "./project.js";
+import { Area, Layer, Structure, Project, parseProject } from "./project.js";
 import { Camera } from "./camera.js";
 
 window.Quadtree = Quadtree;
@@ -19,12 +19,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   canvas.width = canvas.clientWidth * window.devicePixelRatio;
   canvas.height = canvas.clientHeight * window.devicePixelRatio;
-  window.addEventListener("resize", e => {
+  canvas.addEventListener("resize", e => {
     canvas.width = canvas.clientWidth * window.devicePixelRatio;
     canvas.height = canvas.clientHeight * window.devicePixelRatio;
 
     processFrame();
   });
+
+  // Open Project 반응
+  const openProjectDiv = document.querySelector("#open-project");
+  openProjectDiv.onclick = () => {
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = () => {
+      // you can use this method to get file and perform respective operations
+      const file = input.files[0];
+      const read = new FileReader();
+      read.readAsBinaryString(file);
+      read.onloadend = () => {
+        window.project = parseProject(read.result);
+        processFrame();
+      }
+    };
+    input.click();
+  };
 
   // 한프레임 처리
   processFrame();

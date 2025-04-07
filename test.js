@@ -133,4 +133,3 @@ function projectTest2() {
   })
 }
 
-projectTest1();
