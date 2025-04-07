@@ -12,6 +12,8 @@ let ctx;
 window.project = new Project("Untitled", new Layer("Layer 1"));
 window.camera = new Camera(0.5, 0.5, 1000.0);
 
+let projectStructureDiv;
+
 document.addEventListener("DOMContentLoaded", () => {
   // canvas 불러오기 및 이벤트 추가
   canvas = document.querySelector("#canvas");
@@ -27,6 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     processFrame();
   });
+
+  // projectStructureDiv
+  projectStructureDiv = document.querySelector("#project-structure");
 
   // Open Project 반응
   const openProjectDiv = document.querySelector("#open-project");
@@ -52,11 +57,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
+ * 프로젝트 구조 패널을 업데이트
+ */
+function renderProjectStructureDiv() {
+  projectStructureDiv.innerHTML = "";
+  projectStructureDiv.appendChild(project.renderDiv());
+}
+
+/**
  * 프로젝트를 적용
  * @param {Project} project - 불러올 프로젝트
  */
 function loadProject(project) {
   window.project = project;
+
+  renderProjectStructureDiv();
 }
 
 /**

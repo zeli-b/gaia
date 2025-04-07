@@ -17,6 +17,17 @@ export class Area {
     this.color = color;
     this.id = undefined; // 영역 식별자
   }
+
+  /**
+   * 영역 정보를 프로젝트 패널에 렌더
+   */
+  renderDiv() {
+    const container = document.createElement("div");
+    container.classList.add("structure-area");
+    container.innerText = `${this.name} (${this.color})`;
+
+    return container;
+  }
 }
 
 /**
@@ -35,6 +46,17 @@ export class Structure {
   constructor(startYear, figure) {
     this.startYear = startYear;
     this.figure = figure;
+  }
+
+  /**
+   * 구조 패널에서 구조체를 렌더
+   */
+  renderDiv() {
+    const container = document.createElement("div");
+    container.classList.add("structure-layer");
+    container.innerText = `Structure from ${this.startYear}`;
+
+    return container;
   }
 
   /**
@@ -87,6 +109,44 @@ export class Layer {
 
     return this;
   }
+
+  /**
+   * 프로젝트 레이어 패널에 표시될 내용을 렌더
+   */
+  renderDiv() {
+    const container = document.createElement("div");
+    container.classList.add("structure-layer");
+
+    const layerTitle = document.createElement("div");
+    layerTitle.innerText = this.name;
+    container.appendChild(layerTitle);
+
+    const areasDiv = document.createElement("div");
+    areasDiv.classList.add("structure-area-div");
+    Object.keys(this.areas).forEach(id => {
+      const area = this.areas[id];
+      areasDiv.appendChild(area.renderDiv());
+    });
+    container.appendChild(areasDiv);
+
+    const structureDiv = document.createElement("div");
+    structureDiv.classList.add("structure-structure-div");
+    const structure = this.getLastStructure();
+    if (structure) {
+      structureDiv.appendChild(structure.renderDiv());
+      container.appendChild(structureDiv);
+    }
+
+    const layersDiv = document.createElement("div");
+    layersDiv.classList.add("structure-layers-div");
+    this.childLayers.forEach(l => {
+      layersDiv.appendChild(l.renderDiv());
+    });
+    container.appendChild(layersDiv);
+
+    return container;
+  }
+
   /**
    * 구조체 추가
    * @param {Structure} structure 
@@ -153,6 +213,25 @@ export class Project {
    */
   render(canvas, context, camera) {
     this.baseLayer.render(canvas, context, camera);
+  }
+
+  /**
+   * 프로젝트 구조 패널에 들어갈 내용을 렌더
+   */
+  renderDiv() {
+    // container div
+    const container = document.createElement("div");
+
+    // name div
+    const nameDiv = document.createElement("div");
+    nameDiv.innerText = this.name;
+    container.appendChild(nameDiv);
+
+    // layers
+    const layerDiv = this.baseLayer.renderDiv();
+    container.appendChild(layerDiv);
+
+    return container;
   }
 }
 
