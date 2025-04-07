@@ -53,7 +53,7 @@ export class Structure {
    */
   renderDiv() {
     const container = document.createElement("div");
-    container.classList.add("structure-layer");
+    container.classList.add("structure-structure");
     container.innerText = `Structure from ${this.startYear}`;
 
     return container;
@@ -121,14 +121,6 @@ export class Layer {
     layerTitle.innerText = this.name;
     container.appendChild(layerTitle);
 
-    const areasDiv = document.createElement("div");
-    areasDiv.classList.add("structure-area-div");
-    Object.keys(this.areas).forEach(id => {
-      const area = this.areas[id];
-      areasDiv.appendChild(area.renderDiv());
-    });
-    container.appendChild(areasDiv);
-
     const structureDiv = document.createElement("div");
     structureDiv.classList.add("structure-structure-div");
     const structure = this.getLastStructure();
@@ -136,6 +128,14 @@ export class Layer {
       structureDiv.appendChild(structure.renderDiv());
       container.appendChild(structureDiv);
     }
+
+    const areasDiv = document.createElement("div");
+    areasDiv.classList.add("structure-area-div");
+    Object.keys(this.areas).forEach(id => {
+      const area = this.areas[id];
+      areasDiv.appendChild(area.renderDiv());
+    });
+    container.appendChild(areasDiv);
 
     const layersDiv = document.createElement("div");
     layersDiv.classList.add("structure-layers-div");

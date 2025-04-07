@@ -1,6 +1,7 @@
 body {
     margin: 0;
     font-family: sans-serif;
+    overflow: hidden;
 }
 
 .container {
@@ -28,4 +29,23 @@ body {
 
 .properties {
     min-width: 200px;
+}
+
+.structure-layer,
+.structure-area,
+.structure-structure {
+    padding-left: 12px;
+    margin-top: 8px;
+}
+
+.structure-layer {
+    border-left: 1px lightgrey solid;
+}
+
+.structure-area {
+    border-left: 1px red solid;
+}
+
+.structure-structure {
+    border-left: 1px purple solid;
 }
