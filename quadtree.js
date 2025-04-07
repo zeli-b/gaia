@@ -519,6 +519,46 @@ export class Quadtree {
   }
 
   /**
+   * 쿼드트리를 화면에 보일 수 있게 렌더링한다
+   * @param {object} areas - 각 색상에 대한 정보
+   * @param {canvas} canvas - 지도 렌더링될 레이어
+   * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
+   * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
+   * @param {number} depth - 함수 실행 깊이
+   * @param {number} dx - 배치 위치 오프셋
+   * @param {number} dy - 배치 위치 오프셋
+   * @returns {Quadtree}
+   */
+   render(areas, canvas, context, camera, depth = 0, dx = 0, dy = 0) {
+    const size = camera.zoom / Math.pow(2, depth);
+    if (!this.isDivided()) {
+      const x = camera.convertMapToScreenX(dx, canvas);
+      const y = camera.convertMapToScreenY(dy, canvas);
+      const color = areas[this.value].color;
+
+      context.fillStyle = color;
+      context.fillRect(x, y, size, size);
+      return this;
+    }
+
+    const half = size / 2;
+    this.children[0].render(
+      areas, canvas, context, camera, depth+1, dx, dy
+    );
+    this.children[1].render(
+      areas, canvas, context, camera, depth+1, dx+half, dy
+    );
+    this.children[2].render(
+      areas, canvas, context, camera, depth+1, dx, dy+half
+    );
+    this.children[3].render(
+      areas, canvas, context, camera, depth+1, dx+half, dy+half
+    );
+
+    return this;
+  }
+
+  /**
    * 현재 셀의 중심이 주어진 원 내에 포함되는지 확인
    * @param {number} x - 원 중심 x
    * @param {number} y - 원 중심 y

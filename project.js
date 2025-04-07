@@ -36,6 +36,19 @@ export class Structure {
     this.startYear = startYear;
     this.figure = figure;
   }
+
+  /**
+   * 레이어를 화면에 보일 수 있게 렌더링한다
+   * @param {object} areas - 각 색상에 대한 정보
+   * @param {canvas} canvas - 지도 렌더링될 레이어
+   * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
+   * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
+   * @returns {Structure}
+   */
+  render(areas, canvas, context, camera) {
+    this.figure.render(areas, canvas, context, camera);
+    return this;
+  }
 }
 
 /**
@@ -58,6 +71,23 @@ export class Layer {
   }
 
   /**
+   * 레이어를 화면에 보일 수 있게 렌더링한다
+   * @param {canvas} canvas - 지도 렌더링될 레이어
+   * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
+   * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
+   * @returns {Layer}
+   */
+  render(canvas, context, camera) {
+    const structure = this.getLastStructure();
+
+    if (structure)
+      structure.render(this.areas, canvas, context, camera);
+
+    this.childLayers.forEach(l => l.render(canvas, context, camera));
+
+    return this;
+  }
+  /**
    * 구조체 추가
    * @param {Structure} structure 
    */
@@ -71,7 +101,7 @@ export class Layer {
    * @returns {Structure}
    */
   getLastStructure() {
-    return self.structures[self.structures.length - 1];
+    return this.structures[this.structures.length - 1];
   }
 
   /**
@@ -112,6 +142,17 @@ export class Project {
    */
   stringify() {
     return JSON.stringify(this, null, 1);
+  }
+
+  /**
+   * 프로젝트를 화면에 보일 수 있게 렌더링한다
+   * @param {canvas} canvas - 지도 렌더링될 레이어
+   * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
+   * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
+   * @returns {Project}
+   */
+  render(canvas, context, camera) {
+    this.baseLayer.render(canvas, context, camera);
   }
 }
 

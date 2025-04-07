@@ -51,6 +51,8 @@ function render() {
       ctx.fillRect(x, y, 10, 10);
       ctx.fillRect(x + 10, y + 10, 10, 10);
     }
+
+  window.project.render(canvas, ctx, window.camera);
 }
 
 /**
