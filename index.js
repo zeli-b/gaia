@@ -74,6 +74,11 @@ document.addEventListener("DOMContentLoaded", () => {
     resizeCanvas();
   };
 
+  const processFrameDiv = document.querySelector("#process-frame");
+  processFrameDiv.onclick = () => {
+    processFrame();
+  };
+
   // 한프레임 처리
   processFrame();
 });

@@ -98,7 +98,7 @@ function projectTest1() {
   // 날씨 레이어
   const we = new Layer("Weather");
 
-  const wearno = new Area("Good", "lightgrey");
+  const wearno = new Area("Good", "transparent");
   we.addArea(wearno);
   const wearza = new Area("Snow", "white");
   we.addArea(wearza);
