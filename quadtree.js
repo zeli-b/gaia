@@ -248,19 +248,20 @@ export class Quadtree {
    * @param {number} y - 원 중심의 y 좌표
    * @param {number} radius - 반지름 (0~1)
    * @param {any} value - 채울 값
+   * @param {any} [ellipseRate] - 가로:세로 비율
    * @param {number} [recurseLevel=DEFAULT_DEPTH] - 최대 재귀 깊이
    * @returns {Quadtree}
    */
-  drawCircle(x, y, radius, value, recurseLevel = DEFAULT_DEPTH) {
+  drawCircle(x, y, radius, value, ellipseRate = 1, recurseLevel = DEFAULT_DEPTH) {
     if (recurseLevel <= 0)
       return
 
-    const luc = Math.hypot(x - 0, y - 0) < radius;
-    const ruc = Math.hypot(x - 1, y - 0) < radius;
-    const ldc = Math.hypot(x - 0, y - 1) < radius;
-    const rdc = Math.hypot(x - 1, y - 1) < radius;
+    const luc = Math.hypot((x - 0) / ellipseRate, y - 0) < radius;
+    const ruc = Math.hypot((x - 1) / ellipseRate, y - 0) < radius;
+    const ldc = Math.hypot((x - 0) / ellipseRate, y - 1) < radius;
+    const rdc = Math.hypot((x - 1) / ellipseRate, y - 1) < radius;
 
-    const distance = pointToRectDistance(x, y);
+    const distance = pointToRectDistance((x - 0.5) / ellipseRate + 0.5, y);
     if (distance > radius) {
       return this;
     }
@@ -279,10 +280,11 @@ export class Quadtree {
     const nrx = 2 * x - 1;
     const nuy = 2 * y;
     const ndy = 2 * y - 1;
-    this.children[0].drawCircle(nlx, nuy, nr, value, --recurseLevel);
-    this.children[1].drawCircle(nrx, nuy, nr, value, recurseLevel);
-    this.children[2].drawCircle(nlx, ndy, nr, value, recurseLevel);
-    this.children[3].drawCircle(nrx, ndy, nr, value, recurseLevel);
+    recurseLevel--;
+    this.children[0].drawCircle(nlx, nuy, nr, value, ellipseRate, recurseLevel);
+    this.children[1].drawCircle(nrx, nuy, nr, value, ellipseRate, recurseLevel);
+    this.children[2].drawCircle(nlx, ndy, nr, value, ellipseRate, recurseLevel);
+    this.children[3].drawCircle(nrx, ndy, nr, value, ellipseRate, recurseLevel);
 
     return this.reduce();
   }

@@ -62,6 +62,17 @@ function quadtreeTest2() {
 }
 
 /**
+ * 타원 그리기 테스트
+ */
+function quadtreeTest3() {
+  const qt = new Quadtree(0);
+  qt.drawCircle(0.5, 0.5, 0.2, 1, 2);
+  console.log(JSON.stringify(qt.toJSON()));
+}
+
+quadtreeTest3();
+
+/**
  * 프로젝트 전체 테스트
  * - 지형, 날씨, 국가 레이어 구성 및 구조체 생성
  */
@@ -132,5 +143,3 @@ function projectTest2() {
     console.log(pr.baseLayer.structures[0].figure);
   })
 }
-
-projectTest1();
