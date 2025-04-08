@@ -6,12 +6,14 @@ export class Camera {
    * 카메라 오브젝트를 생성
    * @param {number} x - 카메라의 x좌표 초기값
    * @param {number} y - 카메라의 y좌표 초기값
-   * @param {number} zoom - 카메라의 확대율 초기값
+   * @param {number} xZoom - 카메라의 확대율 초기값
+   * @param {number} yZoom - 카메라의 확대율 초기값
    */
-  constructor(x, y, zoom) {
+  constructor(x, y, xZoom, yZoom) {
     this.x = x;
     this.y = y;
-    this.zoom = zoom;
+    this.xZoom = xZoom;
+    this.yZoom = yZoom;
   }
 
   /**
@@ -22,7 +24,7 @@ export class Camera {
    * @return {number} - screenX가 나타내는 지도상의 x좌표
    */
   convertScreenToMapX(canvas, screenX) {
-    return (screenX - canvas.width / 2) / this.zoom + this.x;
+    return (screenX - canvas.width / 2) / this.xZoom + this.x;
   }
 
   /**
@@ -33,7 +35,7 @@ export class Camera {
    * @return {number} - mapX가 나타내는 화면상의 x좌표
    */
   convertMapToScreenX(canvas, mapX) {
-    return (mapX - this.x) * this.zoom + canvas.width / 2;
+    return (mapX - this.x) * this.xZoom + canvas.width / 2;
   }
 
   /**
@@ -44,7 +46,7 @@ export class Camera {
    * @return {number} - screenY가 나타내는 지도상의 y좌표
    */
   convertScreenToMapY(canvas, screenY) {
-    return (screenY - canvas.height / 2) / this.zoom + this.y;
+    return (screenY - canvas.height / 2) / this.yZoom + this.y;
   }
 
   /**
@@ -55,7 +57,7 @@ export class Camera {
    * @return {number} - mape가 나타내는 화면상의 y좌표
    */
   convertMapToScreenY(canvas, mapY) {
-    return (mapY - this.y) * this.zoom + canvas.height / 2;
+    return (mapY - this.y) * this.yZoom + canvas.height / 2;
   }
 
   /**
@@ -79,8 +81,18 @@ export class Camera {
    * @param {number} zoom - 바꿀 카메라 표시 배율
    * @returns {Camera}
    */
-  setZoom(zoom) {
-    this.zoom = Math.max(Math.min(zoom, 1000000), 1);
+  setXZoom(zoom) {
+    this.xZoom = Math.max(Math.min(zoom, 2000000), 2);
+    return this;
+  }
+
+  /**
+   * 카메라의 표시 배율을 바꿈
+   * @param {number} zoom - 바꿀 카메라 표시 배율
+   * @returns {Camera}
+   */
+  setYZoom(zoom) {
+    this.yZoom = Math.max(Math.min(zoom, 1000000), 1);
     return this;
   }
 }

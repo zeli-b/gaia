@@ -22,7 +22,7 @@ function resizeCanvas() {
 let canvas;
 let ctx;
 window.project = new Project("Untitled", new Layer("Layer 1"));
-window.camera = new Camera(0.5, 0.5, 1000.0);
+window.camera = new Camera(0.5, 0.5, 1000.0, 500.0);
 
 let projectStructureDiv;
 
@@ -173,14 +173,16 @@ window.addEventListener("touchmove", e => {
 
   if (scaling > 0) {
     const newScale = getPinchDistance(e);
-    window.camera.zoom *= newScale / scaling;
+    // window.camera.zoom *= newScale / scaling;
+    window.camera.setXZoom(window.camera.xZoom * (newScale / scaling));
+    window.camera.setYZoom(window.camera.yZoom * (newScale / scaling));
     scaling = newScale;
 
     const newPosition = getPinchPosition(e);
     const dx = newPosition[0] - pinchCenter[0];
     const dy = newPosition[1] - pinchCenter[1];
-    window.camera.setX(window.camera.x - dx / window.camera.zoom);
-    window.camera.setY(window.camera.y - dy / window.camera.zoom);
+    window.camera.setX(window.camera.x - dx / window.camera.xZoom);
+    window.camera.setY(window.camera.y - dy / window.camera.yZoom);
     pinchCenter = newPosition;
     
     processFrame();
