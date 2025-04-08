@@ -11,22 +11,25 @@
   </head>
   <body>
     <div class="container">
-      <div class="topbar">
-        <div id="open-project">Open Project</div>
+      <div class="topbar" id="topbar">
+        <span id="open-project">Open Project</span>
+        <span id="fullscreen">Fullscreen</span>
       </div>
       <div class="area">
-        <div class="toolbar">
+        <div class="toolbar" id="toolbar">
           toolbar
         </div>
         <div class="display">
           <canvas id="canvas" class="canvas" />
         </div>
-        <div class="properties">
+        <div class="properties" id="properties">
           <div>구조</div>
           <div id="project-structure"></div>
         </div>
       </div>
-      <div class="bottombar">Bottombar</div>
+      <div class="bottombar" id="bottombar">
+        Bottombar
+      </div>
     </div>
   </body>
 </html>
