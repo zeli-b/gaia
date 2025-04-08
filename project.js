@@ -131,6 +131,7 @@ export class Layer {
     disableToggle.checked = true;
     disableToggle.onchange = e => {
       this.disabled = !e.target.checked;
+      document.dispatchEvent(new Event("processframe"));
     };
     layerTitle.appendChild(disableToggle);
     

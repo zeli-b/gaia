@@ -137,6 +137,7 @@ export function processFrame() {
   render();
 }
 window.processFrame = processFrame;
+document.addEventListener("processframe", processFrame);
 
 // 휴대폰 핀치 스크롤 대응
 let scaling = 0;
