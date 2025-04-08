@@ -70,7 +70,7 @@ export class Camera {
    * 카메라의 x좌표를 설정
    */
   setY(y) {
-    this.y = (y % 1 + 1) % 1;
+    this.y = Math.min(Math.max(y, 0), 1);
     return this;
   }
 
