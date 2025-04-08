@@ -529,7 +529,7 @@ export class Quadtree {
    * @param {number} dy - 배치 위치 오프셋
    * @returns {Quadtree}
    */
-   render(areas, canvas, context, camera, depth = 0, dx = 0, dy = 0) {
+   render(areas, canvas, context, camera, dx = 0, dy = 0, depth = 0) {
     const size = camera.zoom / Math.pow(2, depth);
     if (!this.isDivided()) {
       const x = camera.convertMapToScreenX(canvas, dx);
@@ -538,22 +538,21 @@ export class Quadtree {
 
       context.fillStyle = color;
       context.fillRect(x, y, size, size);
-      console.log(dx, dy, x, y, size, color);
       return this;
     }
 
     const half = 0.5 / Math.pow(2, depth);
     this.children[0].render(
-      areas, canvas, context, camera, depth+1, dx, dy
+      areas, canvas, context, camera, dx, dy, depth+1
     );
     this.children[1].render(
-      areas, canvas, context, camera, depth+1, dx+half, dy
+      areas, canvas, context, camera, dx+half, dy, depth+1
     );
     this.children[2].render(
-      areas, canvas, context, camera, depth+1, dx, dy+half
+      areas, canvas, context, camera, dx, dy+half, depth+1
     );
     this.children[3].render(
-      areas, canvas, context, camera, depth+1, dx+half, dy+half
+      areas, canvas, context, camera, dx+half, dy+half, depth+1
     );
 
     return this;

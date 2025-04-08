@@ -68,7 +68,10 @@ export class Structure {
    * @returns {Structure}
    */
   render(areas, canvas, context, camera) {
-    this.figure.render(areas, canvas, context, camera);
+    const left = Math.floor(camera.convertScreenToMapX(canvas, 0));
+    const right = Math.ceil(camera.convertScreenToMapX(canvas, canvas.width));
+    for (let x = left; x < right; x++)
+      this.figure.render(areas, canvas, context, camera, x);
     return this;
   }
 }

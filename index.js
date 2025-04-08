@@ -179,8 +179,8 @@ window.addEventListener("touchmove", e => {
     const newPosition = getPinchPosition(e);
     const dx = newPosition[0] - pinchCenter[0];
     const dy = newPosition[1] - pinchCenter[1];
-    window.camera.x -= dx / window.camera.zoom;
-    window.camera.y -= dy / window.camera.zoom;
+    window.camera.setX(window.camera.x - dx / window.camera.zoom);
+    window.camera.setY(window.camera.y - dy / window.camera.zoom);
     pinchCenter = newPosition;
     
     processFrame();

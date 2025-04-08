@@ -59,6 +59,22 @@ export class Camera {
   }
 
   /**
+   * 카메라의 x좌표를 설정
+   */
+  setX(x) {
+    this.x = (x % 1 + 1) % 1;
+    return this;
+  }
+
+  /**
+   * 카메라의 x좌표를 설정
+   */
+  setY(y) {
+    this.y = (y % 1 + 1) % 1;
+    return this;
+  }
+
+  /**
    * 카메라의 표시 배율을 바꿈
    * @param {number} zoom - 바꿀 카메라 표시 배율
    * @returns {Camera}
