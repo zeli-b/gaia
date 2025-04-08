@@ -26,6 +26,7 @@ window.camera = new Camera(0.5, 0.5, 1000.0);
 
 let projectStructureDiv;
 
+// 페이지 DOM이 로드되었을 때 실행할 동작을 정의
 document.addEventListener("DOMContentLoaded", () => {
   // 파츠 불러오기
   const propertiesDiv = document.querySelector("#properties");
@@ -131,3 +132,59 @@ function processFrame() {
   render();
 }
 window.processFrame = processFrame;
+
+// 휴대폰 핀치 스크롤 대응
+let scaling = 0;
+let pinchCenter = null;
+
+/**
+ * 터치 관련 이벤트를 받아서 두 손가락 사이의 거리를 측정
+ */
+function getPinchDistance(e) {
+  return Math.hypot(
+    e.touches[0].pageX - e.touches[1].pageX,
+    e.touches[0].pageY - e.touches[1].pageY
+  );
+}
+
+/**
+ * 터치 관련 이벤트를 받아서 두 손가락 사이의 평균 위치를 측정
+ */
+function getPinchPosition(e) {
+  const x = (e.touches[0].pageX + e.touches[1].pageX) / 2;
+  const y = (e.touches[0].pageY + e.touches[1].pageY) / 2;
+  return [x, y];
+}
+
+window.addEventListener("touchstart", e => {
+  if (e.touches.length === 2) {
+    scaling = getPinchDistance(e);
+    pinchCenter = getPinchPosition(e);
+  }
+});
+
+window.addEventListener("touchmove", e => {
+  if (event.scale !== 1) { event.preventDefault(); }
+
+  if (scaling > 0) {
+    const newScale = getPinchDistance(e);
+    window.camera.zoom *= newScale / scaling;
+    scaling = newScale;
+
+    const newPosition = getPinchPosition(e);
+    const dx = newPosition[0] - pinchCenter[0];
+    const dy = newPosition[1] - pinchCenter[1];
+    window.camera.x -= dx / window.camera.zoom;
+    window.camera.y -= dy / window.camera.zoom;
+    pinchCenter = newPosition;
+    
+    processFrame();
+  }
+}, { passive: false });
+
+window.addEventListener("touchend", e => {
+  if (scaling) {
+    scaling = 0;
+    pinchCenter = null;
+  }
+});
