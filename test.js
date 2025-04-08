@@ -80,6 +80,21 @@ function projectTest1() {
 
   bl.addStructure(blst1);
 
+  // 국가 레이어
+  const co = new Layer("Country");
+
+  const coarno = new Area("No Country", "transparent");
+  co.addArea(coarno);
+  const coarza = new Area("Zasoque", "yellow");
+  co.addArea(coarza);
+
+  const cost1fig = new Quadtree(coarno.id);
+  cost1fig.drawRect(0.5, 0.0, 1.0, 0.5, coarza.id);
+  const cost1 = new Structure(0, cost1fig);
+  co.addStructure(cost1);
+
+  bl.addChildLayer(co);
+
   // 날씨 레이어
   const we = new Layer("Weather");
 
@@ -100,21 +115,6 @@ function projectTest1() {
 
   bl.addChildLayer(we);
 
-  // 국가 레이어
-  const co = new Layer("Country");
-
-  const coarno = new Area("No Country", "grey");
-  co.addArea(coarno);
-  const coarza = new Area("Zasoque", "yellow");
-  co.addArea(coarza);
-
-  const cost1fig = new Quadtree(coarno.id);
-  cost1fig.drawRect(0.5, 0.0, 1.0, 0.5, coarza.id);
-  const cost1 = new Structure(0, cost1fig);
-  co.addStructure(cost1);
-
-  bl.addChildLayer(co);
-
   // 프로젝트 생성
   const pr = new Project("Sat Worldmap", bl);
 
@@ -133,3 +133,4 @@ function projectTest2() {
   })
 }
 
+projectTest1();
