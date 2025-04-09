@@ -8,11 +8,33 @@ window.Layer = Layer;
 window.Structure = Structure;
 
 // 도구 관련 기능들
+const toolVar = {};
 const tools = {
   span: {
     id: "span",
     label: "Span",
-    adds: {}
+    adds: {
+      touchstart: e => {
+        const touch = e.touches[0];
+        toolVar.px = touch.screenX;
+        toolVar.py = touch.screenY;
+      },
+      touchmove: e => {
+        const touch = e.touches[0];
+
+        if (toolVar.px && toolVar.py && !scaling) {
+          const dx = (touch.screenX - toolVar.px) * window.devicePixelRatio;
+          const dy = (touch.screenY - toolVar.py) * window.devicePixelRatio;
+
+          window.camera.setX(window.camera.x - dx / window.camera.xZoom);
+          window.camera.setY(window.camera.y - dy / window.camera.yZoom);
+          processFrame();
+        }
+
+        toolVar.px = touch.screenX;
+        toolVar.py = touch.screenY;
+      }
+    }
   },
   zoom: {
     id: "zoom",
@@ -284,7 +306,7 @@ function getPinchPosition(e) {
 
 window.addEventListener("touchstart", e => {
   if (e.touches.length === 2) {
-    scaling = getPinchDistance(e);
+    scaling = getPinchDistance(e) * window.devicePixelRatio;
     pinchCenter = getPinchPosition(e);
   }
 });
@@ -293,15 +315,15 @@ window.addEventListener("touchmove", e => {
   if (event.scale !== 1) { event.preventDefault(); }
 
   if (scaling > 0) {
-    const newScale = getPinchDistance(e);
+    const newScale = getPinchDistance(e) * window.devicePixelRatio;
     // window.camera.zoom *= newScale / scaling;
     window.camera.setXZoom(window.camera.xZoom * (newScale / scaling));
     window.camera.setYZoom(window.camera.yZoom * (newScale / scaling));
     scaling = newScale;
 
     const newPosition = getPinchPosition(e);
-    const dx = newPosition[0] - pinchCenter[0];
-    const dy = newPosition[1] - pinchCenter[1];
+    const dx = (newPosition[0] - pinchCenter[0]) * window.devicePixelRatio;
+    const dy = (newPosition[1] - pinchCenter[1]) * window.devicePixelRatio;
     window.camera.setX(window.camera.x - dx / window.camera.xZoom);
     window.camera.setY(window.camera.y - dy / window.camera.yZoom);
     pinchCenter = newPosition;
