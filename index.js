@@ -24,6 +24,7 @@ let ctx;
 window.project = new Project("Untitled", new Layer("Layer 1"));
 window.camera = new Camera(0.5, 0.5, 1000.0, 500.0);
 
+let presentInput;
 let projectStructureDiv;
 
 // 페이지 DOM이 로드되었을 때 실행할 동작을 정의
@@ -41,6 +42,12 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = canvas.clientWidth * window.devicePixelRatio;
   canvas.height = canvas.clientHeight * window.devicePixelRatio;
   window.addEventListener("resize", resizeCanvas);
+
+  // present
+  presentInput = document.querySelector("#present");
+  presentInput.onchange = e => {
+    processFrame();
+  };
 
   // projectStructureDiv
   projectStructureDiv = document.querySelector("#project-structure");
@@ -98,6 +105,7 @@ function renderProjectStructureDiv() {
 function loadProject(project) {
   window.project = project;
 
+  presentInput.value = project.getLastYear();
   renderProjectStructureDiv();
 }
 
@@ -124,7 +132,8 @@ function render() {
     }
 
   // render project
-  window.project.render(canvas, ctx, window.camera);
+  const year = presentInput.value;
+  window.project.render(year, canvas, ctx, window.camera);
 }
 
 /**

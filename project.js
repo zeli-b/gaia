@@ -98,22 +98,62 @@ export class Layer {
 
   /**
    * 레이어를 화면에 보일 수 있게 렌더링한다
+   * @param {number} year - 지도 렌더링될 연도
    * @param {canvas} canvas - 지도 렌더링될 레이어
    * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
    * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
    * @returns {Layer}
    */
-  render(canvas, context, camera) {
+  render(year, canvas, context, camera) {
     if (this.disabled) return this;
 
-    const structure = this.getLastStructure();
+    const structure = this.getStructure(year);
 
-    if (structure)
+    if (structure) {
       structure.render(this.areas, canvas, context, camera);
+    }
 
-    this.childLayers.forEach(l => l.render(canvas, context, camera));
+    this.childLayers.forEach(l => l.render(year, canvas, context, camera));
 
     return this;
+  }
+
+  /**
+   * 수정사항이 발생한 가장 마지막 연도를 반환
+   */
+  getLastYear() {
+    let result = 0;
+
+    const structure = this.getLastStructure();
+    if (structure)
+      result = Math.max(result, structure.startYear);
+
+    this.childLayers.forEach(l => result = Math.max(l.getLastYear()));
+
+    return result;
+  }
+
+  /**
+   * 특정 연도에 표시되는 구조체를 반환
+   * @param {number} year - 표시할 연도
+   */
+  getStructure(year) {
+    const structures = this.structures;
+    let left = 0;
+    let right = structures.length - 1;
+    let answer = null;
+
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      if (structures[mid].startYear <= year) {
+        answer = structures[mid];
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+
+    return answer;
   }
 
   /**
@@ -213,6 +253,13 @@ export class Project {
   }
 
   /**
+   * 프로젝트 내 최후의 변경사항이 생긴 연도를 반환
+   */
+  getLastYear() {
+    return this.baseLayer.getLastYear();
+  }
+
+  /**
    * 프로젝트를 JSON 문자열로 변환
    * @returns {string}
    */
@@ -222,13 +269,14 @@ export class Project {
 
   /**
    * 프로젝트를 화면에 보일 수 있게 렌더링한다
+   * @param {number} year - 지도 렌더링될 시각
    * @param {canvas} canvas - 지도 렌더링될 레이어
    * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
    * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
    * @returns {Project}
    */
-  render(canvas, context, camera) {
-    this.baseLayer.render(canvas, context, camera);
+  render(year, canvas, context, camera) {
+    this.baseLayer.render(year, canvas, context, camera);
   }
 
   /**
