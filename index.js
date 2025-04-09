@@ -56,14 +56,39 @@ const tools = {
 
         toolVar.px = e.screenX;
         toolVar.py = e.screenY;
-      }
+      },
 
     }
   },
   zoom: {
     id: "zoom",
     label: "Zoom",
-    adds: {}
+    adds: {
+      mousedown: e => {
+        toolVar.px = e.screenX;
+        toolVar.py = e.screenY;
+        toolVar.isSpanning = true;
+      },
+      mouseup: e => {
+        toolVar.px = undefined;
+        toolVar.py = undefined;
+        toolVar.isSpanning = false;
+      },
+      mousemove: e => {
+        if (toolVar.isSpanning) {
+          const dx = (e.screenX - toolVar.px) * window.devicePixelRatio;
+          const dy = (e.screenY - toolVar.py) * window.devicePixelRatio;
+          const d = dx - dy;
+
+          window.camera.setXZoom(window.camera.xZoom * Math.exp(d * 0.002));
+          window.camera.setYZoom(window.camera.yZoom * Math.exp(d * 0.002));
+          processFrame();
+        }
+
+        toolVar.px = e.screenX;
+        toolVar.py = e.screenY;
+      }
+    }
   },
 };
 window.tools = tools;
