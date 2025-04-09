@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import { Quadtree } from "./quadtree.js";
+import { parseQuadtree, Quadtree } from "./quadtree.js";
 import { parseProject, Project, Layer, Area, Structure } from "./project.js";
 
 /**
@@ -70,7 +70,38 @@ function quadtreeTest3() {
   console.log(JSON.stringify(qt.toJSON()));
 }
 
-quadtreeTest3();
+/**
+ * 빼기 테스트
+ */
+function quadtreeTest4() {
+  const qt = new Quadtree(0);
+  qt.drawCircle(0.5, 0.5, 0.5, 1);
+  qt.drawPoly([
+    [0.5, 0.1],
+    [0.6175, 0.3412],
+    [0.875, 0.3412],
+    [0.675, 0.5412],
+    [0.7587, 0.825],
+    [0.5, 0.66],
+    [0.2412, 0.825],
+    [0.325, 0.5412],
+    [0.125, 0.3412],
+    [0.3825, 0.3412]
+  ], 2);
+  qt.drawCircle(0.2, 0.2, 0.15, 3);
+  qt.drawRect(0.75, 0.75, 0.95, 0.95, 4);
+  qt.drawCircle(0.5, 0.5, 0.15, 5);
+  qt.drawRect(0.05, 0.8, 0.2, 0.95, 6);
+  qt.drawCircle(0.8, 0.2, 0.18, 7);
+
+  const qta = parseQuadtree(qt.toJSON());
+  qta.drawCircle(0.5, 0.5, 0.4, 8);
+
+  const result = qta.subtract(qt)
+  console.log(JSON.stringify(result.toJSON()));
+}
+
+quadtreeTest4();
 
 /**
  * 프로젝트 전체 테스트

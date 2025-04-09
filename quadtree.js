@@ -1,4 +1,4 @@
-const DEFAULT_DEPTH = 12;
+const DEFAULT_DEPTH = 10;
 
 /**
  * 점(x, y)이 정사각형 영역(0~1) 밖에 있다면, 해당 점에서 가장 가까운 정사각형 경계까지의 거리를 계산함
@@ -217,22 +217,22 @@ export class Quadtree {
    */
   reduce() {
     if (this.isReduced)
-      return;
+      return this;
 
     if (!this.isDivided())
-      return;
+      return this;
 
     this.children.forEach(c => c.reduce());
 
     if (this.children.some(c => c.isDivided())) {
-      return;
+      return this;
     }
 
     const value = this.children
       .reduce((a, b) => a !== null && a.value === b.value ? a : null);
     
     if (value === null) {
-      return;
+      return this;
     }
 
     this.children = null;
@@ -346,7 +346,7 @@ export class Quadtree {
    * @param {Object} [boundingBox] - AABB 바운딩 박스 (없으면 자동 계산)
    * @returns {Quadtree}
    */
-  drawPoly(points, value, recurseLevel, boundingBox = DEFAULT_DEPTH) {
+  drawPoly(points, value, recurseLevel = DEFAULT_DEPTH, boundingBox = undefined) {
     if (recurseLevel <= 0)
       return;
 
@@ -521,6 +521,40 @@ export class Quadtree {
   }
 
   /**
+   * 두 쿼드트리 사이의 차이를 계산.
+   * 일반적으로 overlap의 역연산을 정의
+   */
+  subtract(qt, fallbackValue = 0) {
+    if (!qt.isDivided()) {
+      if (!this.isDivided()) {
+        if (qt.getValue() === this.getValue()) {
+          return new Quadtree(fallbackValue);
+        }
+        return new Quadtree(qt.getValue());
+      }
+
+      const result = new Quadtree(fallbackValue).divide();
+      for (let i = 0; i < 4; i++) {
+        result.setChild(i, this.children[i].subtract(qt));
+      }
+      return result.reduce();
+    }
+
+    const result = new Quadtree(fallbackValue).divide();
+    if (!this.isDivided()) {
+      for (let i = 0; i < 4; i++) {
+        result.setChild(i, this.subtract(qt.children[i]));
+      }
+      return result.reduce();
+    }
+
+    for (let i = 0; i < 4; i++) {
+      result.setChild(i, this.children[i].subtract(qt.children[i]));
+    }
+    return result.reduce();
+  }
+
+  /**
    * 쿼드트리를 화면에 보일 수 있게 렌더링한다
    * @param {object} areas - 각 색상에 대한 정보
    * @param {canvas} canvas - 지도 렌더링될 레이어
@@ -531,7 +565,7 @@ export class Quadtree {
    * @param {number} dy - 배치 위치 오프셋
    * @returns {Quadtree}
    */
-   render(areas, canvas, context, camera, dx = 0, dy = 0, depth = 0) {
+  render(areas, canvas, context, camera, dx = 0, dy = 0, depth = 0) {
     const xSize = camera.xZoom / Math.pow(2, depth);
     const ySize = camera.yZoom / Math.pow(2, depth);
     if (!this.isDivided()) {
