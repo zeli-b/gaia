@@ -54,19 +54,26 @@ body {
 
 .structure-layer,
 .structure-area,
-.structure-structure {
+.structure-area-div,
+.structure-structure,
+.structure-structure-div {
     padding-left: 12px;
-    margin-top: 8px;
+    margin-top: 4px;
 }
 
 .structure-layer {
     border-left: 1px lightgrey solid;
 }
 
+.structure-area-div {
+    border-left: 1px orange solid;
+}
+
 .structure-area {
     border-left: 1px red solid;
 }
 
-.structure-structure {
+.structure-structure,
+.structure-structure-div {
     border-left: 1px purple solid;
 }

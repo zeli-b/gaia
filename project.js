@@ -24,6 +24,7 @@ export class Area {
    */
   renderDiv() {
     const container = document.createElement("div");
+    container.style.borderLeft = `${this.color} 1px solid`;
     container.classList.add("structure-area");
     container.innerText = `${this.name} (${this.color})`;
 
