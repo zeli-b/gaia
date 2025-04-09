@@ -46,6 +46,10 @@ export class Structure {
   constructor(startYear, figure) {
     this.startYear = startYear;
     this.figure = figure;
+
+    this._canvas = document.createElement("canvas");
+    this._ctx = this._canvas.getContext("2d");
+    this._rendered = false;
   }
 
   /**
@@ -65,14 +69,26 @@ export class Structure {
    * @param {canvas} canvas - 지도 렌더링될 레이어
    * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
    * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
+   * @param {boolean} [force] - 강제로 다시 그릴지 여부
    * @returns {Structure}
    */
-  render(areas, canvas, context, camera) {
-    const left = Math.floor(camera.convertScreenToMapX(canvas, 0));
-    const right = Math.ceil(camera.convertScreenToMapX(canvas, canvas.width));
-    for (let x = left; x < right; x++)
-      this.figure.render(areas, canvas, context, camera, x);
-    return this;
+  render(areas, canvas, context, camera, force = false) {
+    if (this._rendered && !force) {
+      const left = camera.convertMapToScreenX(canvas, 0) % camera.xZoom
+        - camera.xZoom;
+      const up = camera.convertMapToScreenY(canvas, 0);
+      context.imageSmoothingEnabled = false;
+      for (let x = left; x < canvas.width; x += camera.xZoom) {
+        context.drawImage(this._canvas, x, up, camera.xZoom, camera.yZoom);
+      }
+      return;
+    }
+
+    this._canvas.width = Math.pow(2, this.figure.getDepth());
+    this._canvas.height = this._canvas.width;
+    this.figure.render(areas, this._canvas, this._ctx);
+    this._rendered = true;
+    this.render(areas, canvas, context, camera, false);
   }
 }
 

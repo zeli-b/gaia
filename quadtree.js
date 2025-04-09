@@ -565,31 +565,31 @@ export class Quadtree {
    * @param {number} dy - 배치 위치 오프셋
    * @returns {Quadtree}
    */
-  render(areas, canvas, context, camera, dx = 0, dy = 0, depth = 0) {
-    const xSize = camera.xZoom / Math.pow(2, depth);
-    const ySize = camera.yZoom / Math.pow(2, depth);
+  render(areas, canvas, context, dx = 0, dy = 0, depth = 0) {
+    const size = canvas.width / Math.pow(2, depth);
+
     if (!this.isDivided()) {
-      const x = camera.convertMapToScreenX(canvas, dx);
-      const y = camera.convertMapToScreenY(canvas, dy);
       const color = areas[this.value].color;
 
       context.fillStyle = color;
-      context.fillRect(x, y, xSize, ySize);
+      context.fillRect(dx, dy, size, size);
+      console.log(dx, dy, size, color);
       return this;
     }
 
-    const half = 0.5 / Math.pow(2, depth);
+    depth++;
+    const half = size / 2;
     this.children[0].render(
-      areas, canvas, context, camera, dx, dy, depth+1
+      areas, canvas, context, dx, dy, depth
     );
     this.children[1].render(
-      areas, canvas, context, camera, dx+half, dy, depth+1
+      areas, canvas, context, dx+half, dy, depth
     );
     this.children[2].render(
-      areas, canvas, context, camera, dx, dy+half, depth+1
+      areas, canvas, context, dx, dy+half, depth
     );
     this.children[3].render(
-      areas, canvas, context, camera, dx+half, dy+half, depth+1
+      areas, canvas, context, dx+half, dy+half, depth
     );
 
     return this;
@@ -622,6 +622,18 @@ export class Quadtree {
    */
   hasPoint(x, y) {
     return 0 <= x && x < 1 && 0 <= y && y < 1;
+  }
+
+  /**
+   * 쿼드트리의 최대 깊이를 출력.
+   * 만약 쿼드트리가 나누어져있지 않다면 0을 출력함.
+   */
+  getDepth() {
+    if (!this.isDivided()) {
+      return 0;
+    }
+
+    return this.children.reduce((a, b) => Math.max(a, b.getDepth()), 0) + 1;
   }
 
   /**
