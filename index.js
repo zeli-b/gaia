@@ -143,7 +143,7 @@ const topbar = [
         read.onloadend = () => {
           const project = parseProject(read.result);
           loadProject(project);
-          processFrame();
+          processFrame(true);
         }
       };
       input.click();
@@ -191,7 +191,7 @@ const topbar = [
     id: "process-frame",
     label: "Process Frame",
     onclick: () => {
-      processFrame();
+      processFrame(true);
     }
   },
 ];
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // present
   presentInput = document.querySelector("#present");
   presentInput.onchange = e => {
-    processFrame();
+    processFrame(true);
   };
 
   // topbar items
@@ -267,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
   projectStructureDiv = document.querySelector("#project-structure");
 
   // 한프레임 처리
-  processFrame();
+  processFrame(true);
 });
 
 /**
@@ -299,8 +299,9 @@ function tick() {
 /**
  * 화면에 보이는 것들을 렌더링하는 함수
  * 프레임마다 혹은 이벤트 발생 시마다 실행됨
+ * @param {boolean} [force] - 강제로 화면를 렌더할지 결정
  */
-function render() {
+function render(force = false) {
   // 배경 색 칠
   ctx.fillStyle = "lightgrey";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -313,7 +314,7 @@ function render() {
 
   // render project
   const year = presentInput.value;
-  window.project.render(year, canvas, ctx, window.camera);
+  window.project.render(year, canvas, ctx, window.camera, force);
 
   // render 경도선, 위도선
   
@@ -376,17 +377,17 @@ function render() {
 
 /**
  * tick과 render 함수를 한번에 실행하는 함수
- *
  * 이벤트 처리 시에는 이 함수를 콜해서 화면을 업데이트해주어야 한다.
+ * @param {boolean} [force] - 강제로 화면을 렌더할지 결정
  */
-export function processFrame() {
+export function processFrame(force = false) {
   renderProjectStructureDiv();
   resizeCanvas();
   tick();
-  render();
+  render(force);
 }
 window.processFrame = processFrame;
-document.addEventListener("processframe", processFrame);
+document.addEventListener("processframe", e => processFrame(e.detail.force));
 
 // 휴대폰 핀치 스크롤 대응
 let scaling = 0;

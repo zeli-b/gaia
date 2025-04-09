@@ -35,7 +35,9 @@ export class Area {
       const color = prompt("color");
       if (!color) return;
       this.color = color;
-      document.dispatchEvent(new Event("processframe"));
+      document.dispatchEvent(
+        new CustomEvent("processframe", {detail: {force: true}})
+      );
     };
     container.appendChild(recolorButton);
 
@@ -44,7 +46,9 @@ export class Area {
     deleteButton.innerText = "Remove Area";
     deleteButton.onclick = () => {
       this._removed = true;
-      document.dispatchEvent(new Event("processframe"));
+      document.dispatchEvent(
+        new CustomEvent("processframe", {detail: {force: true}})
+      );
     };
     container.appendChild(deleteButton);
 
@@ -141,15 +145,16 @@ export class Layer {
    * @param {canvas} canvas - 지도 렌더링될 레이어
    * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
    * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
+   * @param {boolean} force - 강제로 화면을 업데이트할지 결정
    * @returns {Layer}
    */
-  render(year, canvas, context, camera) {
+  render(year, canvas, context, camera, force = false) {
     if (this.disabled) return this;
 
     const structure = this.getStructure(year);
 
     if (structure) {
-      structure.render(this.areas, canvas, context, camera);
+      structure.render(this.areas, canvas, context, camera, force);
     }
 
     this.childLayers.forEach(l => l.render(year, canvas, context, camera));
@@ -214,7 +219,9 @@ export class Layer {
     disableToggle.checked = !this.disabled;
     disableToggle.onchange = e => {
       this.disabled = !e.target.checked;
-      document.dispatchEvent(new Event("processframe"));
+      document.dispatchEvent(
+        new CustomEvent("processframe", {detail: {force: true}})
+      );
     };
     layerTitle.appendChild(disableToggle);
 
@@ -223,7 +230,9 @@ export class Layer {
     deleteLayerButton.innerText = "Delete";
     deleteLayerButton.onclick = () => {
       this.removeSelf();
-      document.dispatchEvent(new Event("processframe"));
+      document.dispatchEvent(
+        new CustomEvent("processframe", {detail: {force: true}})
+      );
     };
     layerTitle.appendChild(deleteLayerButton);
     
@@ -234,7 +243,7 @@ export class Layer {
       const name = prompt("name");
       if (!name) return;
       this.name = name;
-      document.dispatchEvent(new Event("processframe"));
+      document.dispatchEvent(new CustomEvent("processframe"));
     };
     layerTitle.appendChild(renameLayerButton);
     
@@ -269,7 +278,7 @@ export class Layer {
       if (!color) return;
       const area = new Area(name, color);
       this.addArea(area);
-      document.dispatchEvent(new Event("processframe"));
+      document.dispatchEvent(new CustomEvent("processframe"));
     };
     areasDiv.appendChild(newAreaButton);
 
@@ -289,7 +298,7 @@ export class Layer {
       if (!name) return;
       const newLayer = new Layer(name);
       this.addChildLayer(newLayer);
-      document.dispatchEvent(new Event("processframe"));
+      document.dispatchEvent(new CustomEvent("processframe"));
     };
     layersDiv.appendChild(newLayerButton);
 
@@ -366,10 +375,11 @@ export class Project {
    * @param {canvas} canvas - 지도 렌더링될 레이어
    * @param {CanvasRenderingContext2D} context - 지도 2차원 렌더링 맥락
    * @param {Camera} camera - 현재 지도를 비추고 있는 카메라 객체
+   * @param {boolean} force - 강제로 화면을 렌더할지 결정
    * @returns {Project}
    */
-  render(year, canvas, context, camera) {
-    this.baseLayer.render(year, canvas, context, camera);
+  render(year, canvas, context, camera, force = false) {
+    this.baseLayer.render(year, canvas, context, camera, force);
   }
 
   /**
@@ -414,7 +424,9 @@ export function parseProject(json) {
   }
 
   function parseLayer(layerData) {
-    const layer = new Layer(layerData.name, layerData.unaffected, layerData.parentAreaIds);
+    const layer = new Layer(
+      layerData.name, layerData.unaffected, layerData.parentAreaIds
+    );
     layer.lastId = layerData.lastId;
 
     // areas: Dictionary<int, Area>

@@ -573,7 +573,6 @@ export class Quadtree {
 
       context.fillStyle = color;
       context.fillRect(dx, dy, size, size);
-      console.log(dx, dy, size, color);
       return this;
     }
 
