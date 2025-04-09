@@ -28,6 +28,17 @@ export class Area {
     container.classList.add("structure-area");
     container.innerText = `${this.name} (${this.color})`;
 
+    const recolorButton = document.createElement("button");
+    recolorButton.style.display = "block";
+    recolorButton.innerText = "Change Color";
+    recolorButton.onclick = () => {
+      const color = prompt("color");
+      if (!color) return;
+      this.color = color;
+      document.dispatchEvent(new Event("processframe"));
+    };
+    container.appendChild(recolorButton);
+
     const deleteButton = document.createElement("button");
     deleteButton.style.display = "block";
     deleteButton.innerText = "Remove Area";
