@@ -346,3 +346,14 @@ window.addEventListener("wheel", e => {
 
   processFrame();
 })
+
+window.addEventListener("wheel", e => {
+  if (e.ctrlKey) {
+    e.preventDefault();
+
+    window.camera.setXZoom(window.camera.xZoom * Math.exp(e.deltaY * 0.002));
+    window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * 0.002));
+
+    processFrame();
+  }
+}, { passive: false });
