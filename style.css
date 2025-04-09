@@ -4,6 +4,20 @@ body {
     overflow: hidden;
 }
 
+@media (prefers-color-scheme: light) {
+    body {
+        background-color: #f7f7f9;
+        color: #19191e;;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #2c2c2c;
+        color: #f7f7f9;
+    }
+}
+
 .container {
     height: 100dvh;
     display: flex;
