@@ -11,21 +11,38 @@ window.Structure = Structure;
 const tools = {
   span: {
     id: "span",
-    label: "Span"
+    label: "Span",
+    adds: {}
   },
   zoom: {
     id: "zoom",
-    label: "Zoom"
+    label: "Zoom",
+    adds: {}
   },
 };
 window.tools = tools;
 let nowTool;
 
 function setTool(toolId) {
-  const tool = Object.values(tools).find(t => t.id === toolId);
+  if (nowTool) {
+    // remove previous tools
+    const prvTool = tools[nowTool];
+    Object.keys(prvTool.adds).forEach(k => {
+      const v = prvTool.adds[k];
+      window.removeEventListener(k, v);
+    });
+  }
+
+  // apply mew tools
+  const tool = tools[toolId];
 
   if (!tool)
     throw new Error("Tool not found");
+
+  Object.keys(tool.adds).forEach(k => {
+    const v = tool.adds[k];
+    window.addEventListener(k, v);
+  });
 
   nowTool = tool.id;
 }
