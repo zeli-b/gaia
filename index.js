@@ -126,8 +126,6 @@ function resizeCanvas() {
   canvas.height = 0;
   canvas.width = canvas.clientWidth * window.devicePixelRatio;
   canvas.height = canvas.clientHeight * window.devicePixelRatio;
-
-  processFrame();
 }
 
 const topbar = [
@@ -383,6 +381,7 @@ function render() {
  */
 export function processFrame() {
   renderProjectStructureDiv();
+  resizeCanvas();
   tick();
   render();
 }
