@@ -97,7 +97,7 @@ function quadtreeTest4() {
   const qta = parseQuadtree(qt.toJSON());
   qta.drawCircle(0.5, 0.5, 0.4, 8);
 
-  const result = qta.subtract(qt)
+  const result = qta.difference(qt)
   console.log(JSON.stringify(result.toJSON()));
 }
 

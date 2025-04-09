@@ -524,7 +524,7 @@ export class Quadtree {
    * 두 쿼드트리 사이의 차이를 계산.
    * 일반적으로 overlap의 역연산을 정의
    */
-  subtract(qt, fallbackValue = 0) {
+  difference(qt, fallbackValue = 0) {
     if (!qt.isDivided()) {
       if (!this.isDivided()) {
         if (qt.getValue() === this.getValue()) {
@@ -535,7 +535,7 @@ export class Quadtree {
 
       const result = new Quadtree(fallbackValue).divide();
       for (let i = 0; i < 4; i++) {
-        result.setChild(i, this.children[i].subtract(qt));
+        result.setChild(i, this.children[i].difference(qt));
       }
       return result.reduce();
     }
@@ -543,13 +543,13 @@ export class Quadtree {
     const result = new Quadtree(fallbackValue).divide();
     if (!this.isDivided()) {
       for (let i = 0; i < 4; i++) {
-        result.setChild(i, this.subtract(qt.children[i]));
+        result.setChild(i, this.difference(qt.children[i]));
       }
       return result.reduce();
     }
 
     for (let i = 0; i < 4; i++) {
-      result.setChild(i, this.children[i].subtract(qt.children[i]));
+      result.setChild(i, this.children[i].difference(qt.children[i]));
     }
     return result.reduce();
   }
