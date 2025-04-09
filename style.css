@@ -27,6 +27,13 @@ body {
     height: 100%;
 }
 
+.exit-fullscreen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
 .properties {
     min-width: 200px;
 }

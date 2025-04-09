@@ -78,9 +78,22 @@ document.addEventListener("DOMContentLoaded", () => {
     toolbarDiv.style.display = "none";
     topbarDiv.style.display = "none";
     bottombarDiv.style.display = "none";
+    exitFullscreenDiv.style.display = "block";
     resizeCanvas();
   };
 
+  // Exit Fullscreen 반응
+  const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
+  exitFullscreenDiv.onclick = () => {
+    propertiesDiv.style.display = "block";
+    toolbarDiv.style.display = "block";
+    topbarDiv.style.display = "block";
+    bottombarDiv.style.display = "block";
+    exitFullscreenDiv.style.display = "none";
+    resizeCanvas();
+  };
+
+  // Process frame 반응
   const processFrameDiv = document.querySelector("#process-frame");
   processFrameDiv.onclick = () => {
     processFrame();
