@@ -21,7 +21,8 @@ function resizeCanvas() {
 
 const topbar = [
   {
-    query: "#open-project",
+    id: "open-project",
+    label: "Open",
     onclick: () => {
       let input = document.createElement('input');
       input.type = 'file';
@@ -40,7 +41,27 @@ const topbar = [
     }
   },
   {
-    query: "#fullscreen",
+    id: "save-project",
+    label: "Save",
+    onclick: () => {
+      const text = window.project.stringify();
+      const filename = window.project.name + ".json";
+
+      const a = document.createElement('a');
+      a.setAttribute(
+        'href',
+        'data:text/plain;charset=utf-8,' + encodeURIComponent(text)
+      );
+      a.setAttribute('download', filename);
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  },
+  {
+    id: "fullscreen",
+    label: "Fullscreen",
     onclick: () => {
       // 파츠 불러오기
       const propertiesDiv = document.querySelector("#properties");
@@ -58,7 +79,8 @@ const topbar = [
     }
   },
   {
-    query: "#process-frame",
+    id: "process-frame",
+    label: "Process Frame",
     onclick: () => {
       processFrame();
     }
@@ -90,8 +112,13 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // topbar items
-  topbar.forEach(({ query, onclick }) => {
-    document.querySelector(query).onclick = onclick;
+  const topbarDiv = document.querySelector("#topbar");
+  topbar.forEach(({ id, label, onclick }) => {
+    const span = document.createElement("span");
+    span.innerText = label;
+    span.id = id;
+    span.onclick = onclick;
+    topbarDiv.appendChild(span);
   });
 
   // exit fullscreen process
@@ -100,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // 파츠 불러오기
       const propertiesDiv = document.querySelector("#properties");
       const toolbarDiv = document.querySelector("#toolbar");
-      const topbarDiv = document.querySelector("#topbar");
       const bottombarDiv = document.querySelector("#bottombar");
       const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
 
