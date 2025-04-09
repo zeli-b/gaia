@@ -189,7 +189,7 @@ export class Layer {
 
     const disableToggle = document.createElement("input");
     disableToggle.type = "checkbox";
-    disableToggle.checked = true;
+    disableToggle.checked = !this.disabled;
     disableToggle.onchange = e => {
       this.disabled = !e.target.checked;
       document.dispatchEvent(new Event("processframe"));
@@ -216,6 +216,17 @@ export class Layer {
       document.dispatchEvent(new Event("processframe"));
     };
     layerTitle.appendChild(deleteLayerButton);
+    
+    const renameLayerButton = document.createElement("button");
+    renameLayerButton.style.display = "block";
+    renameLayerButton.innerText = "Rename";
+    renameLayerButton.onclick = () => {
+      const name = prompt("name");
+      if (!name) return;
+      this.name = name;
+      document.dispatchEvent(new Event("processframe"));
+    };
+    layerTitle.appendChild(renameLayerButton);
     
     container.appendChild(layerTitle);
 
