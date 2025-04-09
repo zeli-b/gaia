@@ -33,7 +33,31 @@ const tools = {
 
         toolVar.px = touch.screenX;
         toolVar.py = touch.screenY;
+      },
+      mousedown: e => {
+        toolVar.px = e.screenX;
+        toolVar.py = e.screenY;
+        toolVar.isSpanning = true;
+      },
+      mouseup: e => {
+        toolVar.px = undefined;
+        toolVar.py = undefined;
+        toolVar.isSpanning = false;
+      },
+      mousemove: e => {
+        if (toolVar.isSpanning) {
+          const dx = (e.screenX - toolVar.px) * window.devicePixelRatio;
+          const dy = (e.screenY - toolVar.py) * window.devicePixelRatio;
+
+          window.camera.setX(window.camera.x - dx / window.camera.xZoom);
+          window.camera.setY(window.camera.y - dy / window.camera.yZoom);
+          processFrame();
+        }
+
+        toolVar.px = e.screenX;
+        toolVar.py = e.screenY;
       }
+
     }
   },
   zoom: {
