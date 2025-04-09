@@ -596,6 +596,14 @@ export class Quadtree {
   }
 
   /**
+   * 쿼드트리가 비어있는지 확인
+   * @param {number} [withValue] - 이것으로 쿼드트리가 가득차있는지 확인
+   */
+  isEmpty(withValue = 0) {
+    return !this.isDivided() && this.getValue() === withValue;
+  }
+
+  /**
    * 현재 셀의 중심이 주어진 원 내에 포함되는지 확인
    * @param {number} x - 원 중심 x
    * @param {number} y - 원 중심 y
