@@ -16,6 +16,7 @@ export class Area {
     this.name = name;
     this.color = color;
     this.id = undefined; // 영역 식별자
+    this._removed = false;
   }
 
   /**
@@ -25,6 +26,15 @@ export class Area {
     const container = document.createElement("div");
     container.classList.add("structure-area");
     container.innerText = `${this.name} (${this.color})`;
+
+    const deleteButton = document.createElement("button");
+    deleteButton.style.display = "block";
+    deleteButton.innerText = "Remove Area";
+    deleteButton.onclick = () => {
+      this._removed = true;
+      document.dispatchEvent(new Event("processframe"));
+    };
+    container.appendChild(deleteButton);
 
     return container;
   }
@@ -196,18 +206,6 @@ export class Layer {
     };
     layerTitle.appendChild(disableToggle);
 
-    const newLayerButton = document.createElement("button");
-    newLayerButton.style.display = "block";
-    newLayerButton.innerText = "New Layer";
-    newLayerButton.onclick = () => {
-      const name = prompt("Layer Name");
-      if (!name) return;
-      const newLayer = new Layer(name);
-      this.addChildLayer(newLayer);
-      document.dispatchEvent(new Event("processframe"));
-    };
-    layerTitle.appendChild(newLayerButton);
-
     const deleteLayerButton = document.createElement("button");
     deleteLayerButton.style.display = "block";
     deleteLayerButton.innerText = "Delete";
@@ -239,11 +237,29 @@ export class Layer {
 
     const areasDiv = document.createElement("div");
     areasDiv.classList.add("structure-area-div");
+    Object.keys(this.areas).forEach(k => {
+      if (this.areas[k]._removed)
+        delete this.areas[k];
+    });
     Object.keys(this.areas).forEach(id => {
       const area = this.areas[id];
       areasDiv.appendChild(area.renderDiv());
     });
     container.appendChild(areasDiv);
+
+    const newAreaButton = document.createElement("button");
+    newAreaButton.style.display = "block";
+    newAreaButton.innerText = "New Area";
+    newAreaButton.onclick = () => {
+      const name = prompt("name of the area");
+      if (!name) return;
+      const color = prompt("color of the area");
+      if (!color) return;
+      const area = new Area(name, color);
+      this.addArea(area);
+      document.dispatchEvent(new Event("processframe"));
+    };
+    areasDiv.appendChild(newAreaButton);
 
     const layersDiv = document.createElement("div");
     layersDiv.classList.add("structure-layers-div");
@@ -252,6 +268,18 @@ export class Layer {
       layersDiv.appendChild(l.renderDiv());
     });
     container.appendChild(layersDiv);
+
+    const newLayerButton = document.createElement("button");
+    newLayerButton.style.display = "block";
+    newLayerButton.innerText = "New Layer";
+    newLayerButton.onclick = () => {
+      const name = prompt("Layer Name");
+      if (!name) return;
+      const newLayer = new Layer(name);
+      this.addChildLayer(newLayer);
+      document.dispatchEvent(new Event("processframe"));
+    };
+    layersDiv.appendChild(newLayerButton);
 
     return container;
   }
