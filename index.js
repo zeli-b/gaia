@@ -11,13 +11,59 @@ window.Structure = Structure;
  * 화면 크기 변경에 대응하여 캔버스의 크기를 재조정
  */
 function resizeCanvas() {
-    canvas.width = 0;
-    canvas.height = 0;
-    canvas.width = canvas.clientWidth * window.devicePixelRatio;
-    canvas.height = canvas.clientHeight * window.devicePixelRatio;
+  canvas.width = 0;
+  canvas.height = 0;
+  canvas.width = canvas.clientWidth * window.devicePixelRatio;
+  canvas.height = canvas.clientHeight * window.devicePixelRatio;
 
-    processFrame();
+  processFrame();
 }
+
+const topbar = [
+  {
+    query: "#open-project",
+    onclick: () => {
+      let input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = () => {
+        // you can use this method to get file and perform respective operations
+        const file = input.files[0];
+        const read = new FileReader();
+        read.readAsBinaryString(file);
+        read.onloadend = () => {
+          const project = parseProject(read.result);
+          loadProject(project);
+          processFrame();
+        }
+      };
+      input.click();
+    }
+  },
+  {
+    query: "#fullscreen",
+    onclick: () => {
+      // 파츠 불러오기
+      const propertiesDiv = document.querySelector("#properties");
+      const toolbarDiv = document.querySelector("#toolbar");
+      const topbarDiv = document.querySelector("#topbar");
+      const bottombarDiv = document.querySelector("#bottombar");
+      const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
+
+      propertiesDiv.style.display = "none";
+      toolbarDiv.style.display = "none";
+      topbarDiv.style.display = "none";
+      bottombarDiv.style.display = "none";
+      exitFullscreenDiv.style.display = "block";
+      resizeCanvas();
+    }
+  },
+  {
+    query: "#process-frame",
+    onclick: () => {
+      processFrame();
+    }
+  },
+];
 
 let canvas;
 let ctx;
@@ -29,12 +75,6 @@ let projectStructureDiv;
 
 // 페이지 DOM이 로드되었을 때 실행할 동작을 정의
 document.addEventListener("DOMContentLoaded", () => {
-  // 파츠 불러오기
-  const propertiesDiv = document.querySelector("#properties");
-  const toolbarDiv = document.querySelector("#toolbar");
-  const topbarDiv = document.querySelector("#topbar");
-  const bottombarDiv = document.querySelector("#bottombar");
-
   // canvas 불러오기 및 이벤트 추가
   canvas = document.querySelector("#canvas");
   ctx = canvas.getContext('2d');
@@ -49,55 +89,31 @@ document.addEventListener("DOMContentLoaded", () => {
     processFrame();
   };
 
-  // projectStructureDiv
-  projectStructureDiv = document.querySelector("#project-structure");
+  // topbar items
+  topbar.forEach(({ query, onclick }) => {
+    document.querySelector(query).onclick = onclick;
+  });
 
-  // Open Project 반응
-  const openProjectDiv = document.querySelector("#open-project");
-  openProjectDiv.onclick = () => {
-    let input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = () => {
-      // you can use this method to get file and perform respective operations
-      const file = input.files[0];
-      const read = new FileReader();
-      read.readAsBinaryString(file);
-      read.onloadend = () => {
-        const project = parseProject(read.result);
-        loadProject(project);
-        processFrame();
-      }
-    };
-    input.click();
-  };
-
-  // Fullscreen 반응
-  const fullscreenDiv = document.querySelector("#fullscreen");
-  fullscreenDiv.onclick = () => {
-    propertiesDiv.style.display = "none";
-    toolbarDiv.style.display = "none";
-    topbarDiv.style.display = "none";
-    bottombarDiv.style.display = "none";
-    exitFullscreenDiv.style.display = "block";
-    resizeCanvas();
-  };
-
-  // Exit Fullscreen 반응
+  // exit fullscreen process
   const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
   exitFullscreenDiv.onclick = () => {
-    propertiesDiv.style.display = "block";
-    toolbarDiv.style.display = "block";
-    topbarDiv.style.display = "block";
-    bottombarDiv.style.display = "block";
-    exitFullscreenDiv.style.display = "none";
-    resizeCanvas();
+      // 파츠 불러오기
+      const propertiesDiv = document.querySelector("#properties");
+      const toolbarDiv = document.querySelector("#toolbar");
+      const topbarDiv = document.querySelector("#topbar");
+      const bottombarDiv = document.querySelector("#bottombar");
+      const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
+
+      propertiesDiv.style.display = "block";
+      toolbarDiv.style.display = "block";
+      topbarDiv.style.display = "block";
+      bottombarDiv.style.display = "block";
+      exitFullscreenDiv.style.display = "none";
+      resizeCanvas();
   };
 
-  // Process frame 반응
-  const processFrameDiv = document.querySelector("#process-frame");
-  processFrameDiv.onclick = () => {
-    processFrame();
-  };
+  // projectStructureDiv
+  projectStructureDiv = document.querySelector("#project-structure");
 
   // 한프레임 처리
   processFrame();
