@@ -110,6 +110,7 @@ export class Layer {
     this.lastId = 0;
     this.parentAreaIds = parentAreaIds ? parentAreaIds : [];
     this.disabled = false;
+    this._removed = false;
   }
 
   /**
@@ -132,6 +133,10 @@ export class Layer {
     this.childLayers.forEach(l => l.render(year, canvas, context, camera));
 
     return this;
+  }
+
+  removeSelf() {
+    this._removed = true;
   }
 
   /**
@@ -190,6 +195,27 @@ export class Layer {
       document.dispatchEvent(new Event("processframe"));
     };
     layerTitle.appendChild(disableToggle);
+
+    const newLayerButton = document.createElement("button");
+    newLayerButton.style.display = "block";
+    newLayerButton.innerText = "New Layer";
+    newLayerButton.onclick = () => {
+      const name = prompt("Layer Name");
+      if (!name) return;
+      const newLayer = new Layer(name);
+      this.addChildLayer(newLayer);
+      document.dispatchEvent(new Event("processframe"));
+    };
+    layerTitle.appendChild(newLayerButton);
+
+    const deleteLayerButton = document.createElement("button");
+    deleteLayerButton.style.display = "block";
+    deleteLayerButton.innerText = "Delete";
+    deleteLayerButton.onclick = () => {
+      this.removeSelf();
+      document.dispatchEvent(new Event("processframe"));
+    };
+    layerTitle.appendChild(deleteLayerButton);
     
     container.appendChild(layerTitle);
 
@@ -210,6 +236,7 @@ export class Layer {
 
     const layersDiv = document.createElement("div");
     layersDiv.classList.add("structure-layers-div");
+    this.childLayers = this.childLayers.filter(l => !l._removed);
     this.childLayers.forEach(l => {
       layersDiv.appendChild(l.renderDiv());
     });

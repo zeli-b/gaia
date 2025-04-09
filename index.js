@@ -382,6 +382,7 @@ function render() {
  * 이벤트 처리 시에는 이 함수를 콜해서 화면을 업데이트해주어야 한다.
  */
 export function processFrame() {
+  renderProjectStructureDiv();
   tick();
   render();
 }
