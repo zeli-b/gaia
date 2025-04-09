@@ -359,6 +359,21 @@ function render() {
   ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 5 / 6));
   ctx.stroke();
 
+  // 경도선
+  const delta = window.camera.xZoom / 12;
+  const start = window.camera.convertMapToScreenX(canvas, 0) % delta;
+  const yStart = Math.max(0, window.camera.convertMapToScreenY(canvas, 0));
+  const yEnd = Math.min(
+    canvas.height, window.camera.convertMapToScreenY(canvas, 1)
+  );
+  for (let x = start; x < canvas.width; x += delta) {
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, yStart);
+    ctx.lineTo(x, yEnd);
+    ctx.stroke();
+  }
 }
 
 /**
