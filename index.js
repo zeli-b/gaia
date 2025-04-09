@@ -347,12 +347,13 @@ window.addEventListener("wheel", e => {
   processFrame();
 })
 
+// 트랙패드 줌 기능
 window.addEventListener("wheel", e => {
   if (e.ctrlKey) {
     e.preventDefault();
 
-    window.camera.setXZoom(window.camera.xZoom * Math.exp(e.deltaY * 0.002));
-    window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * 0.002));
+    window.camera.setXZoom(window.camera.xZoom * Math.exp(e.deltaY * -0.002));
+    window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * -0.002));
 
     processFrame();
   }
