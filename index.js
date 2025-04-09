@@ -7,6 +7,29 @@ window.Area = Area;
 window.Layer = Layer;
 window.Structure = Structure;
 
+// 도구 관련 기능들
+const tools = {
+  span: {
+    id: "span",
+    label: "Span"
+  },
+  zoom: {
+    id: "zoom",
+    label: "Zoom"
+  },
+};
+window.tools = tools;
+let nowTool;
+
+function setTool(toolId) {
+  const tool = Object.values(tools).find(t => t.id === toolId);
+
+  if (!tool)
+    throw new Error("Tool not found");
+
+  nowTool = tool.id;
+}
+
 /**
  * 화면 크기 변경에 대응하여 캔버스의 크기를 재조정
  */
@@ -121,12 +144,28 @@ document.addEventListener("DOMContentLoaded", () => {
     topbarDiv.appendChild(span);
   });
 
+  // toolbar items
+  const toolbarDiv = document.querySelector("#toolbar");
+  Object.values(tools).forEach(t => {
+    const div = document.createElement("div");
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "tool";
+    radio.onclick = () => {
+      setTool(t.id);
+    };
+    div.appendChild(radio);
+    const span = document.createElement("span");
+    span.innerText = t.label;
+    div.appendChild(span);
+    toolbarDiv.appendChild(div);
+  });
+
   // exit fullscreen process
   const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
   exitFullscreenDiv.onclick = () => {
       // 파츠 불러오기
       const propertiesDiv = document.querySelector("#properties");
-      const toolbarDiv = document.querySelector("#toolbar");
       const bottombarDiv = document.querySelector("#bottombar");
       const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
 
