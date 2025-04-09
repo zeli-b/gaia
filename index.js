@@ -141,7 +141,7 @@ const topbar = [
         // you can use this method to get file and perform respective operations
         const file = input.files[0];
         const read = new FileReader();
-        read.readAsBinaryString(file);
+        read.readAsText(file, 'UTf-8');
         read.onloadend = () => {
           const project = parseProject(read.result);
           loadProject(project);
