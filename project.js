@@ -179,11 +179,10 @@ export class Layer {
 
     const structureDiv = document.createElement("div");
     structureDiv.classList.add("structure-structure-div");
-    const structure = this.getLastStructure();
-    if (structure) {
-      structureDiv.appendChild(structure.renderDiv());
-      container.appendChild(structureDiv);
-    }
+    this.structures.forEach(s => {
+      structureDiv.appendChild(s.renderDiv());
+    });
+    container.appendChild(structureDiv);
 
     const areasDiv = document.createElement("div");
     areasDiv.classList.add("structure-area-div");
