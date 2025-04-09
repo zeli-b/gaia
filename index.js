@@ -316,6 +316,49 @@ function render() {
   // render project
   const year = presentInput.value;
   window.project.render(year, canvas, ctx, window.camera);
+
+  // render 경도선, 위도선
+  
+  // 적도선
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 0.5));
+  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 0.5));
+  ctx.stroke();
+  
+  // 북위 30도선
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 1 / 3));
+  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 1 / 3));
+  ctx.stroke();
+
+  // 북위 60도선
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 1 / 6));
+  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 1 / 6));
+  ctx.stroke();
+
+  // 남위 30도선
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 2 / 3));
+  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 2 / 3));
+  ctx.stroke();
+
+  // 남위 60도선
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 5 / 6));
+  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 5 / 6));
+  ctx.stroke();
+
 }
 
 /**
