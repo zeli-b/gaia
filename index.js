@@ -215,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   canvas.width = canvas.clientWidth * window.devicePixelRatio;
   canvas.height = canvas.clientHeight * window.devicePixelRatio;
-  window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("resize", processFrame);
 
   // present
   presentInput = document.querySelector("#present");
@@ -384,8 +384,8 @@ function render(force = false) {
  * @param {boolean} [force] - 강제로 화면을 렌더할지 결정
  */
 export function processFrame(force = false) {
-  renderProjectStructureDiv();
   resizeCanvas();
+  renderProjectStructureDiv();
   tick();
   render(force);
 }
