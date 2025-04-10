@@ -56,6 +56,14 @@ export class Area {
 
     return container;
   }
+
+  /**
+   * 영역의 아이디를 지정
+   */
+  setId(id) {
+    this.id = id;
+    return this;
+  }
 }
 
 /**
@@ -131,14 +139,14 @@ export class Layer {
    */
   constructor(name, unaffected = false, parentAreaIds = null) {
     this.name = name;
-    this.structures = [];
-    this.areas = {}; // key: 영역 ID, value: Area 객체
+    this.structures = [new Structure(0, new Quadtree(0))];
+    this.areas = {0: new Area("No Name", "transparent").setId(0)};
     this.unaffected = unaffected;
     this.childLayers = [];
     this.lastId = 0;
     this.parentAreaIds = parentAreaIds ? parentAreaIds : [];
     this.disabled = false;
-    this.structureVisible = false;
+    this.structureVisible = true;
     this.areaVisible = true;
     this._removed = false;
   }
@@ -254,6 +262,7 @@ export class Layer {
     deleteLayerButton.style.display = "block";
     deleteLayerButton.innerText = "Delete";
     deleteLayerButton.onclick = () => {
+      if (prompt(this.name) !== this.name) return;
       this.removeSelf();
       document.dispatchEvent(
         new CustomEvent("processframe", {detail: {force: true}})
@@ -274,44 +283,44 @@ export class Layer {
     
     container.appendChild(layerTitle);
 
-    if (this.structureVisible) {
-      const structureDiv = document.createElement("div");
-      structureDiv.classList.add("structure-structure-div");
-      this.structures.forEach(s => {
-        structureDiv.appendChild(s.renderDiv());
-      });
-      container.appendChild(structureDiv);
-    }
-
-    if (this.areaVisible) {
-      const areasDiv = document.createElement("div");
-      areasDiv.classList.add("structure-area-div");
-      Object.keys(this.areas).forEach(k => {
-        if (this.areas[k]._removed)
-          delete this.areas[k];
-      });
-      Object.keys(this.areas).forEach(id => {
-        const area = this.areas[id];
-        areasDiv.appendChild(area.renderDiv());
-      });
-      container.appendChild(areasDiv);
-
-      const newAreaButton = document.createElement("button");
-      newAreaButton.style.display = "block";
-      newAreaButton.innerText = "New Area";
-      newAreaButton.onclick = () => {
-        const name = prompt("name of the area");
-        if (!name) return;
-        const color = prompt("color of the area");
-        if (!color) return;
-        const area = new Area(name, color);
-        this.addArea(area);
-        document.dispatchEvent(new CustomEvent("processframe"));
-      };
-      areasDiv.appendChild(newAreaButton);
-    }
-
     if (!this.disabled) {
+      if (this.structureVisible) {
+        const structureDiv = document.createElement("div");
+        structureDiv.classList.add("structure-structure-div");
+        this.structures.forEach(s => {
+          structureDiv.appendChild(s.renderDiv());
+        });
+        container.appendChild(structureDiv);
+      }
+
+      if (this.areaVisible) {
+        const areasDiv = document.createElement("div");
+        areasDiv.classList.add("structure-area-div");
+        Object.keys(this.areas).forEach(k => {
+          if (this.areas[k]._removed)
+            delete this.areas[k];
+        });
+        Object.keys(this.areas).forEach(id => {
+          const area = this.areas[id];
+          areasDiv.appendChild(area.renderDiv());
+        });
+        container.appendChild(areasDiv);
+
+        const newAreaButton = document.createElement("button");
+        newAreaButton.style.display = "block";
+        newAreaButton.innerText = "New Area";
+        newAreaButton.onclick = () => {
+          const name = prompt("name of the area");
+          if (!name) return;
+          const color = prompt("color of the area");
+          if (!color) return;
+          const area = new Area(name, color);
+          this.addArea(area);
+          document.dispatchEvent(new CustomEvent("processframe"));
+        };
+        areasDiv.appendChild(newAreaButton);
+      }
+
       const layersDiv = document.createElement("div");
       layersDiv.classList.add("structure-layers-div");
       this.childLayers = this.childLayers.filter(l => !l._removed);
@@ -359,7 +368,7 @@ export class Layer {
    */
   addArea(area) {
     this.areas[++this.lastId] = area;
-    area.id = this.lastId;
+    area.id.setId(this.lastId);
   }
 
   /**
