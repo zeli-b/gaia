@@ -500,9 +500,10 @@ export class Project {
 export function parseProject(json) {
   const data = typeof json === 'string' ? JSON.parse(json) : json;
 
-  function parseArea(areaData) {
+  function parseArea(areaData, layer) {
     const area = new Area(areaData.name, areaData.color);
     area.id = areaData.id;
+    area._parentLayer = layer;
     return area;
   }
 
@@ -523,7 +524,7 @@ export function parseProject(json) {
 
     // areas: Dictionary<int, Area>
     for (const [id, areaData] of Object.entries(layerData.areas)) {
-      const area = parseArea(areaData);
+      const area = parseArea(areaData, layer);
       area.id = Number(id);
       layer.areas[area.id] = area;
     }
