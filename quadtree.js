@@ -254,17 +254,16 @@ export class Quadtree {
    */
   drawCircle(x, y, radius, value, ellipseRate = 1, recurseLevel = DEFAULT_DEPTH) {
     if (recurseLevel <= 0)
-      return
+      return this;
+
+    const distance = pointToRectDistance((x - 0.5) * ellipseRate + 0.5, y);
+    if (distance > radius)
+      return this;
 
     const luc = Math.hypot((x - 0) / ellipseRate, y - 0) < radius;
     const ruc = Math.hypot((x - 1) / ellipseRate, y - 0) < radius;
     const ldc = Math.hypot((x - 0) / ellipseRate, y - 1) < radius;
     const rdc = Math.hypot((x - 1) / ellipseRate, y - 1) < radius;
-
-    const distance = pointToRectDistance((x - 0.5) / ellipseRate + 0.5, y);
-    if (distance > radius) {
-      return this;
-    }
 
     if ([luc, ruc, ldc, rdc].every(i => i)) {
       this.value = value;

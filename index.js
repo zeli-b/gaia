@@ -96,17 +96,23 @@ const tools = {
     adds: {
       touchmove: e => {
         const touch = e.touches[0];
-        const x = window.camera.convertScreenToMapX(canvas, touch.clientX);
-        const y = window.camera.convertScreenToMapY(canvas, touch.clientY);
-        const radius = 0.1;
+        const cx = (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
+        const cy = (touch.clientY - canvas.offsetTop) * window.devicePixelRatio;
+        const x = window.camera.convertScreenToMapX(canvas, cx);
+        const y = window.camera.convertScreenToMapY(canvas, cy);
+        const mx = (x % 1 + 1) % 1;
+        const radius = 0.05;
         const area = toolVar.area;
 
         const year = parseFloat(presentInput.value);
         const layer = area._parentLayer;
         const structure = layer.getStructureByYear(year);
-        toolVar.structure = structure;
 
-        structure.figure.drawCircle(x, y, radius, area.id, 0.5);
+        console.log(mx);
+
+        structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5);
+        structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5);
+        structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5);
         processFrame(true);
       }
     }
@@ -383,18 +389,20 @@ function render(force = false) {
   ctx.stroke();
 
   // 경도선
-  const delta = window.camera.xZoom / 12;
-  const start = window.camera.convertMapToScreenX(canvas, 0) % delta;
-  const yStart = Math.max(0, window.camera.convertMapToScreenY(canvas, 0));
-  const yEnd = Math.min(
-    canvas.height, window.camera.convertMapToScreenY(canvas, 1)
-  );
-  for (let x = start; x < canvas.width; x += delta) {
-    ctx.strokeStyle = "black";
+  const start = Math.floor(window.camera.convertScreenToMapX(canvas, 0)) * 12;
+  const end = Math.ceil(window.camera.convertScreenToMapX(canvas, canvas.width)) * 12;
+  const yStart = window.camera.convertMapToScreenY(canvas, 0);
+  const yEnd = window.camera.convertMapToScreenY(canvas, 1);
+  for (let x = start; x < end; x++) {
+    if (x % 12 === 6) {
+      ctx.strokeStyle = "red";
+    } else
+      ctx.strokeStyle = "black";
+    const sx = window.camera.convertMapToScreenX(canvas, x / 12);
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(x, yStart);
-    ctx.lineTo(x, yEnd);
+    ctx.moveTo(sx, yStart);
+    ctx.lineTo(sx, yEnd);
     ctx.stroke();
   }
 }
