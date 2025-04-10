@@ -1,4 +1,4 @@
-import { parseQuadtree } from "./quadtree.js";
+import { parseQuadtree, Quadtree } from "./quadtree.js";
 
 /**
  * 영역(Area)을 나타내는 클래스

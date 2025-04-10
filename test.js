@@ -175,17 +175,21 @@ function projectTest2() {
 
 function projectTest3() {
   fs.readFile("./tmp/satqt.json", "utf-8", (err, data) => {
-    data = data.replace(/1/gi, "2").replace(/0/gi, "1");
-    const qt = parseQuadtree(JSON.parse(data));
+    const layer = new Layer("아벨리카 이전 지형");
 
     const oceanarea = new Area("바다", "grey");
     const landarea = new Area("육지", "lightgrey");
 
-    const structure = new Structure(0, qt);
-
-    const layer = new Layer("아벨리카 이전 지형");
     layer.addArea(oceanarea);
     layer.addArea(landarea);
+
+    data = data
+      .replace(/1/gi, JSON.stringify(landarea.id))
+      .replace(/0/gi, JSON.stringify(oceanarea.id));
+    const qt = parseQuadtree(JSON.parse(data));
+
+    const structure = layer.createStructureByYear(0);
+    structure.figure.overlap(qt);
     layer.addStructure(structure);
 
     const proj = new Project("사트 7기 지도", layer);
