@@ -104,17 +104,30 @@ const tools = {
         const radius = 0.05;
         const area = toolVar.area;
 
-        const year = parseFloat(presentInput.value);
-        const layer = area._parentLayer;
-        const structure = layer.getStructureByYear(year);
+        toolVar.areas = area._parentLayer.areas;
 
-        console.log(mx);
-
-        structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5);
-        structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5);
-        structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5);
+        toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5);
+        toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5);
+        toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5);
         processFrame(true);
       }
+    },
+    init: () => {
+      toolVar.structure = new Structure(0, new Quadtree(0));
+
+      const applyButton = document.createElement("button");
+      applyButton.innerText = "Apply";
+      applyButton.onclick = () => {
+        const year = parseFloat(presentInput.value);
+        const change = toolVar.structure;
+        const layer = toolVar.area._parentLayer;
+
+        layer.createStructureByYear(year);
+        layer.forEachStructureAfter(year, s => s.figure.overlap(change.figure));
+
+        toolVar.structure = new Structure(0, new Quadtree(0));
+      };
+      toolPropertiesDiv.appendChild(applyButton);
     }
   }
 };
@@ -131,11 +144,15 @@ function setTool(toolId) {
     });
   }
 
+  toolPropertiesDiv.innerHTML = "";
+
   // apply mew tools
   const tool = tools[toolId];
 
   if (!tool)
     throw new Error("Tool not found");
+
+  if (tool.init) tool.init();
 
   Object.keys(tool.adds).forEach(k => {
     const v = tool.adds[k];
@@ -233,6 +250,7 @@ window.camera = new Camera(0.5, 0.5, 1000.0, 500.0);
 
 let presentInput;
 let projectStructureDiv;
+let toolPropertiesDiv;
 
 // 페이지 DOM이 로드되었을 때 실행할 동작을 정의
 document.addEventListener("DOMContentLoaded", () => {
@@ -249,6 +267,9 @@ document.addEventListener("DOMContentLoaded", () => {
   presentInput.onchange = e => {
     processFrame(true);
   };
+
+  // toolPropertiesDiv
+  toolPropertiesDiv = document.querySelector("#tool-properties");
 
   // topbar items
   const topbarDiv = document.querySelector("#topbar");
@@ -417,6 +438,10 @@ export function processFrame(force = false) {
   resizeCanvas();
   tick();
   render(force);
+
+  if (nowTool === tools.brush.id) {
+    toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, force);
+  }
 }
 window.processFrame = processFrame;
 document.addEventListener("processframe", e => processFrame(e.detail?.force));

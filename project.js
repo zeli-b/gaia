@@ -258,7 +258,7 @@ export class Layer {
    * 연도에 해당하는 구조체가 있다면 그것을 반환하고
    * 없다면 하나를 생성해서 반환한다.
    */
-  getStructureByYear(year) {
+  createStructureByYear(year) {
     const possible = this.getStructure(year);
 
     if (possible.startYear === year) {
@@ -268,6 +268,33 @@ export class Layer {
     const newStructure = possible.clone(year);
     this.addStructure(newStructure);
     return newStructure;
+  }
+
+  /**
+   * 구조체에 대해 실행하는 콜백
+   * @callback StructureCallback
+   * @param {Structure} structure - 구조체
+   */
+
+  /**
+   * 이 시간 이후의 모든 구조체에 대해 콜백을 실행
+   * @param {number} year - 연도
+   * @param {StructureCallback} callback - 구조체에 대해 실행할 함수
+   */
+  forEachStructureAfter(year, callback) {
+    const now = this.getStructure(year);
+    if (!now)
+      return;
+
+    let index = this.structures.indexOf(now);
+    if (now.year < year)
+      index++;
+
+    for (; index < this.structures.length; index++) {
+      callback(this.structures[index]);
+    }
+
+    return this;
   }
 
   /**
