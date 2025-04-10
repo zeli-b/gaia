@@ -101,8 +101,11 @@ const tools = {
         const x = window.camera.convertScreenToMapX(canvas, cx);
         const y = window.camera.convertScreenToMapY(canvas, cy);
         const mx = (x % 1 + 1) % 1;
-        const radius = 0.05;
+        const radius = toolVar.radius;
         const area = toolVar.area;
+
+        toolVar.cx = cx;
+        toolVar.cy = cy;
 
         toolVar.areas = area._parentLayer.areas;
 
@@ -118,14 +121,17 @@ const tools = {
         toolVar.brushing = false;
       },
       mousemove: e => {
-        if (!toolVar.brushing) return;
-
         const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
+        toolVar.cx = cx;
+        toolVar.cy = cy;
+
+        if (!toolVar.brushing) return;
+
         const x = window.camera.convertScreenToMapX(canvas, cx);
         const y = window.camera.convertScreenToMapY(canvas, cy);
         const mx = (x % 1 + 1) % 1;
-        const radius = 0.05;
+        const radius = toolVar.radius;
         const area = toolVar.area;
 
         toolVar.areas = area._parentLayer.areas;
@@ -139,14 +145,25 @@ const tools = {
     init: () => {
       toolVar.structure = new Structure(0, new Quadtree(0));
 
+      const sizeRange = document.createElement("input");
+      sizeRange.type = "range";
+      sizeRange.min = 0;
+      sizeRange.max = 0.2;
+      sizeRange.step = 0.001;
+      sizeRange.onchange = e => {
+        toolVar.radius = e.target.value;
+        toolVar.cx = canvas.width / 2;
+        toolVar.cy = canvas.height / 2;
+        processFrame();
+      };
+      toolPropertiesDiv.appendChild(sizeRange);
+
       const applyButton = document.createElement("button");
       applyButton.innerText = "Apply";
       applyButton.onclick = () => {
         const year = parseFloat(presentInput.value);
         const change = toolVar.structure;
         const layer = toolVar.area._parentLayer;
-
-        console.log("shit");
 
         layer.createStructureByYear(year);
         layer.forEachStructureAfter(year, s => s.figure.overlap(change.figure));
@@ -156,6 +173,11 @@ const tools = {
       toolPropertiesDiv.appendChild(applyButton);
     },
     render: force => {
+      const radius = toolVar.radius * window.camera.yZoom;
+      ctx.beginPath();
+      ctx.arc(toolVar.cx, toolVar.cy, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+
       ctx.globalAlpha = 0.4;
       toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, force);
     }
@@ -190,6 +212,8 @@ function setTool(toolId) {
   });
 
   nowTool = tool.id;
+
+  processFrame();
 }
 
 /**
