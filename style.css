@@ -1,13 +1,12 @@
 body {
     margin: 0;
     font-family: sans-serif;
-    overflow: hidden;
 }
 
 @media (prefers-color-scheme: light) {
     body {
         background-color: #f7f7f9;
-        color: #19191e;;
+        color: #19191e;
     }
 }
 
@@ -50,6 +49,7 @@ body {
 
 .properties {
     min-width: 200px;
+    overflow: scroll;
 }
 
 .structure-layer,
@@ -63,6 +63,7 @@ body {
 
 .structure-layer {
     border-left: 1px lightgrey solid;
+    margin-top: 8px;
 }
 
 .structure-area-div {

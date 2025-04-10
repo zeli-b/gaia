@@ -126,6 +126,9 @@ function resizeCanvas() {
   canvas.height = 0;
   canvas.width = canvas.clientWidth * window.devicePixelRatio;
   canvas.height = canvas.clientHeight * window.devicePixelRatio;
+
+  const propertiesDiv = document.querySelector("#properties");
+  propertiesDiv.style.height = `${canvas.clientHeight - 8}px`;
 }
 
 const topbar = [
@@ -184,7 +187,7 @@ const topbar = [
       topbarDiv.style.display = "none";
       bottombarDiv.style.display = "none";
       exitFullscreenDiv.style.display = "block";
-      resizeCanvas();
+      processFrame();
     }
   },
   {
@@ -260,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
       topbarDiv.style.display = "block";
       bottombarDiv.style.display = "block";
       exitFullscreenDiv.style.display = "none";
-      resizeCanvas();
+      processFrame();
   };
 
   // projectStructureDiv
