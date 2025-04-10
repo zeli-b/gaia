@@ -261,7 +261,7 @@ export class Layer {
   createStructureByYear(year) {
     const possible = this.getStructure(year);
 
-    if (possible.startYear === year) {
+    if (possible.startYear == year) {
       return possible;
     }
 
