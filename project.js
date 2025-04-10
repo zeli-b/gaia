@@ -397,7 +397,12 @@ export class Project {
    * @returns {string}
    */
   stringify() {
-    return JSON.stringify(this, null, 1);
+    return JSON.stringify(this, (key, value) => {
+      if (key.match(/^_.+/)) {
+        return undefined;
+      }
+      return value;
+    }, 1);
   }
 
   /**
