@@ -154,6 +154,10 @@ const tools = {
         processFrame(true);
       };
       toolPropertiesDiv.appendChild(applyButton);
+    },
+    render: force => {
+      ctx.globalAlpha = 0.4;
+      toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, force);
     }
   }
 };
@@ -459,6 +463,12 @@ function render(force = false) {
     ctx.lineTo(sx, yEnd);
     ctx.stroke();
   }
+
+  // tool render
+  if (nowTool) {
+    const renderCallback = tools[nowTool].render;
+    if (renderCallback) renderCallback(force);
+  }
 }
 
 /**
@@ -475,11 +485,6 @@ export function processFrame(force = false) {
   render(force);
 
   presentInputRange.max = window.project.getLastYear() + 1;
-
-  if (nowTool === tools.brush.id) {
-    ctx.globalAlpha = 0.4;
-    toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, force);
-  }
 }
 window.processFrame = processFrame;
 document.addEventListener("processframe", e => processFrame(e.detail?.force));
