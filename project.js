@@ -52,6 +52,17 @@ export class Area {
     };
     container.appendChild(recolorButton);
 
+    const renameButton = document.createElement("button");
+    renameButton.style.display = "block";
+    renameButton.innerText = "Change Name";
+    renameButton.onclick = () => {
+      const name = prompt("name");
+      if (!name) return;
+      this.name = name;
+      document.dispatchEvent(new CustomEvent("processframe"));
+    };
+    container.appendChild(renameButton);
+
     const deleteButton = document.createElement("button");
     deleteButton.style.display = "block";
     deleteButton.innerText = "Remove Area";
