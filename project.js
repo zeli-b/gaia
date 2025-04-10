@@ -111,7 +111,6 @@ export class Structure {
     this.startYear = startYear;
     this.figure = figure;
 
-    this._parentLayer = undefined;
     this._canvas = document.createElement("canvas");
     this._ctx = this._canvas.getContext("2d");
     this._rendered = false;
