@@ -47,7 +47,7 @@ export class Area {
       if (!color) return;
       this.color = color;
       document.dispatchEvent(
-        new CustomEvent("processframe", {detail: {force: true}})
+        new CustomEvent("processframe", {detail: {force: true}}
       );
     };
     container.appendChild(recolorButton);
@@ -539,7 +539,6 @@ export function parseProject(json) {
 
   function parseArea(areaData, layer) {
     const area = new Area(areaData.name, areaData.color);
-    area.id = areaData.id;
     area._parentLayer = layer;
     return area;
   }

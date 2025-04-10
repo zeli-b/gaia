@@ -568,7 +568,7 @@ export class Quadtree {
     const size = canvas.width / Math.pow(2, depth);
 
     if (!this.isDivided()) {
-      const color = areas[this.value].color;
+      const color = areas[this.getValue()].color;
 
       context.fillStyle = color;
       context.fillRect(dx, dy, size, size);

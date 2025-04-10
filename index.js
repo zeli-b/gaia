@@ -124,8 +124,8 @@ const tools = {
 
         layer.createStructureByYear(year);
         layer.forEachStructureAfter(year, s => s.figure.overlap(change.figure));
-
         toolVar.structure = new Structure(0, new Quadtree(0));
+        processFrame(true);
       };
       toolPropertiesDiv.appendChild(applyButton);
     }
