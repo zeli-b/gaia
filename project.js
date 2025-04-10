@@ -138,6 +138,8 @@ export class Layer {
     this.lastId = 0;
     this.parentAreaIds = parentAreaIds ? parentAreaIds : [];
     this.disabled = false;
+    this.structureVisible = false;
+    this.areaVisible = true;
     this._removed = false;
   }
 
@@ -214,7 +216,6 @@ export class Layer {
     container.classList.add("structure-layer");
 
     const layerTitle = document.createElement("span");
-    layerTitle.innerText = this.name;
 
     const disableToggle = document.createElement("input");
     disableToggle.type = "checkbox";
@@ -226,6 +227,28 @@ export class Layer {
       );
     };
     layerTitle.appendChild(disableToggle);
+
+    const structureToggle = document.createElement("input");
+    structureToggle.type = "checkbox";
+    structureToggle.checked = this.structureVisible;
+    structureToggle.onchange = e => {
+      this.structureVisible = e.target.checked;
+      document.dispatchEvent(new CustomEvent("processframe"));
+    };
+    layerTitle.appendChild(structureToggle);
+
+    const areaToggle = document.createElement("input");
+    areaToggle.type = "checkbox";
+    areaToggle.checked = this.areaVisible;
+    areaToggle.onchange = e => {
+      this.areaVisible = e.target.checked;
+      document.dispatchEvent(new CustomEvent("processframe"));
+    };
+    layerTitle.appendChild(areaToggle);
+
+    const realTitle = document.createElement("span");
+    realTitle.innerText = this.name;
+    layerTitle.appendChild(realTitle);
 
     const deleteLayerButton = document.createElement("button");
     deleteLayerButton.style.display = "block";
@@ -251,58 +274,64 @@ export class Layer {
     
     container.appendChild(layerTitle);
 
-    const structureDiv = document.createElement("div");
-    structureDiv.classList.add("structure-structure-div");
-    this.structures.forEach(s => {
-      structureDiv.appendChild(s.renderDiv());
-    });
-    container.appendChild(structureDiv);
+    if (this.structureVisible) {
+      const structureDiv = document.createElement("div");
+      structureDiv.classList.add("structure-structure-div");
+      this.structures.forEach(s => {
+        structureDiv.appendChild(s.renderDiv());
+      });
+      container.appendChild(structureDiv);
+    }
 
-    const areasDiv = document.createElement("div");
-    areasDiv.classList.add("structure-area-div");
-    Object.keys(this.areas).forEach(k => {
-      if (this.areas[k]._removed)
-        delete this.areas[k];
-    });
-    Object.keys(this.areas).forEach(id => {
-      const area = this.areas[id];
-      areasDiv.appendChild(area.renderDiv());
-    });
-    container.appendChild(areasDiv);
+    if (this.areaVisible) {
+      const areasDiv = document.createElement("div");
+      areasDiv.classList.add("structure-area-div");
+      Object.keys(this.areas).forEach(k => {
+        if (this.areas[k]._removed)
+          delete this.areas[k];
+      });
+      Object.keys(this.areas).forEach(id => {
+        const area = this.areas[id];
+        areasDiv.appendChild(area.renderDiv());
+      });
+      container.appendChild(areasDiv);
 
-    const newAreaButton = document.createElement("button");
-    newAreaButton.style.display = "block";
-    newAreaButton.innerText = "New Area";
-    newAreaButton.onclick = () => {
-      const name = prompt("name of the area");
-      if (!name) return;
-      const color = prompt("color of the area");
-      if (!color) return;
-      const area = new Area(name, color);
-      this.addArea(area);
-      document.dispatchEvent(new CustomEvent("processframe"));
-    };
-    areasDiv.appendChild(newAreaButton);
+      const newAreaButton = document.createElement("button");
+      newAreaButton.style.display = "block";
+      newAreaButton.innerText = "New Area";
+      newAreaButton.onclick = () => {
+        const name = prompt("name of the area");
+        if (!name) return;
+        const color = prompt("color of the area");
+        if (!color) return;
+        const area = new Area(name, color);
+        this.addArea(area);
+        document.dispatchEvent(new CustomEvent("processframe"));
+      };
+      areasDiv.appendChild(newAreaButton);
+    }
 
-    const layersDiv = document.createElement("div");
-    layersDiv.classList.add("structure-layers-div");
-    this.childLayers = this.childLayers.filter(l => !l._removed);
-    this.childLayers.forEach(l => {
-      layersDiv.appendChild(l.renderDiv());
-    });
-    container.appendChild(layersDiv);
+    if (!this.disabled) {
+      const layersDiv = document.createElement("div");
+      layersDiv.classList.add("structure-layers-div");
+      this.childLayers = this.childLayers.filter(l => !l._removed);
+      this.childLayers.forEach(l => {
+        layersDiv.appendChild(l.renderDiv());
+      });
+      container.appendChild(layersDiv);
 
-    const newLayerButton = document.createElement("button");
-    newLayerButton.style.display = "block";
-    newLayerButton.innerText = "New Layer";
-    newLayerButton.onclick = () => {
-      const name = prompt("Layer Name");
-      if (!name) return;
-      const newLayer = new Layer(name);
-      this.addChildLayer(newLayer);
-      document.dispatchEvent(new CustomEvent("processframe"));
-    };
-    layersDiv.appendChild(newLayerButton);
+      const newLayerButton = document.createElement("button");
+      newLayerButton.style.display = "block";
+      newLayerButton.innerText = "New Layer";
+      newLayerButton.onclick = () => {
+        const name = prompt("Layer Name");
+        if (!name) return;
+        const newLayer = new Layer(name);
+        this.addChildLayer(newLayer);
+        document.dispatchEvent(new CustomEvent("processframe"));
+      };
+      layersDiv.appendChild(newLayerButton);
+    }
 
     return container;
   }

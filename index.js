@@ -384,13 +384,13 @@ function render(force = false) {
  * @param {boolean} [force] - 강제로 화면을 렌더할지 결정
  */
 export function processFrame(force = false) {
-  resizeCanvas();
   renderProjectStructureDiv();
+  resizeCanvas();
   tick();
   render(force);
 }
 window.processFrame = processFrame;
-document.addEventListener("processframe", e => processFrame(e.detail.force));
+document.addEventListener("processframe", e => processFrame(e.detail?.force));
 
 // 휴대폰 핀치 스크롤 대응
 let scaling = 0;

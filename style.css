@@ -48,7 +48,8 @@ body {
 }
 
 .properties {
-    min-width: 200px;
+    flex: 1;
+    max-width: 200px;
     overflow: scroll;
 }
 
