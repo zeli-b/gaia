@@ -16,6 +16,7 @@ export class Area {
     this.name = name;
     this.color = color;
     this.id = undefined; // 영역 식별자
+    this._parentLayer = undefined;
     this._removed = false;
   }
 
@@ -537,9 +538,8 @@ export class Project {
 export function parseProject(json) {
   const data = typeof json === 'string' ? JSON.parse(json) : json;
 
-  function parseArea(areaData, layer) {
+  function parseArea(areaData) {
     const area = new Area(areaData.name, areaData.color);
-    area._parentLayer = layer;
     return area;
   }
 
@@ -560,8 +560,9 @@ export function parseProject(json) {
 
     // areas: Dictionary<int, Area>
     for (const [id, areaData] of Object.entries(layerData.areas)) {
-      const area = parseArea(areaData, layer);
+      const area = parseArea(areaData);
       area.id = Number(id);
+      area._parentLayer = layer;
       layer.areas[area.id] = area;
     }
 
