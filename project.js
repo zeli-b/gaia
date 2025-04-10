@@ -47,7 +47,7 @@ export class Area {
       if (!color) return;
       this.color = color;
       document.dispatchEvent(
-        new CustomEvent("processframe", {detail: {force: true}}
+        new CustomEvent("processframe", {detail: {force: true}})
       );
     };
     container.appendChild(recolorButton);

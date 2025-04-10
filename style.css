@@ -3,6 +3,7 @@ body {
     font-family: sans-serif;
     background-color: var(--background-color);
     color: var(--color);
+    overflow: hidden;
 }
 
 @media (prefers-color-scheme: light) {
