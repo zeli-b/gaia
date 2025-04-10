@@ -31,6 +31,7 @@ export class Area {
     const radio = document.createElement("input");
     radio.type = "radio";
     radio.name = "area";
+    radio.checked = window.toolVar.area === this;
     radio.onclick = () => {
       document.dispatchEvent(
         new CustomEvent("selectarea", {detail: {area: this}})

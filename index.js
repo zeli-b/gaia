@@ -9,6 +9,7 @@ window.Structure = Structure;
 
 // 도구 관련 기능들
 const toolVar = {};
+window.toolVar = toolVar;
 const tools = {
   span: {
     id: "span",
@@ -56,8 +57,7 @@ const tools = {
 
         toolVar.px = e.screenX;
         toolVar.py = e.screenY;
-      },
-
+      }
     }
   },
   zoom: {
@@ -94,7 +94,7 @@ const tools = {
     id: "brush",
     label: "brush",
     adds: {
-      touchend: e => {
+      touchmove: e => {
         const touch = e.touches[0];
         const x = window.camera.convertScreenToMapX(canvas, touch.clientX);
         const y = window.camera.convertScreenToMapY(canvas, touch.clientY);
@@ -106,9 +106,8 @@ const tools = {
         const structure = layer.getStructureByYear(year);
         toolVar.structure = structure;
 
-        structure.figure.drawCircle(x, y, radius, area.id);
+        structure.figure.drawCircle(x, y, radius, area.id, 0.5);
         processFrame(true);
-        console.log("good");
       }
     }
   }
