@@ -517,6 +517,8 @@ export function parseProject(json) {
       layerData.name, layerData.unaffected, layerData.parentAreaIds
     );
     layer.lastId = layerData.lastId;
+    layer.areas = {};
+    layer.structures = [];
 
     // areas: Dictionary<int, Area>
     for (const [id, areaData] of Object.entries(layerData.areas)) {
