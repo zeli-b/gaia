@@ -145,6 +145,7 @@ function setTool(toolId) {
   }
 
   toolPropertiesDiv.innerHTML = "";
+  for (var member in toolVar) delete toolVar[member];
 
   // apply mew tools
   const tool = tools[toolId];
