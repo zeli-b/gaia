@@ -114,11 +114,12 @@ const tools = {
       mousedown: e => {
         toolVar.brushing = true;
       },
-      mouseup: e=> {
+      mouseup: e => {
         toolVar.brushing = false;
       },
-      mousemove: e=> {
-        if(toolVar.brushing == false){ return; }
+      mousemove: e => {
+        if (!toolVar.brushing) return;
+
         const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
         const x = window.camera.convertScreenToMapX(canvas, cx);
@@ -145,6 +146,8 @@ const tools = {
         const change = toolVar.structure;
         const layer = toolVar.area._parentLayer;
 
+        console.log("shit");
+
         layer.createStructureByYear(year);
         layer.forEachStructureAfter(year, s => s.figure.overlap(change.figure));
         toolVar.structure = new Structure(0, new Quadtree(0));
@@ -168,7 +171,6 @@ function setTool(toolId) {
   }
 
   toolPropertiesDiv.innerHTML = "";
-  for (var member in toolVar) delete toolVar[member];
 
   // apply mew tools
   const tool = tools[toolId];
@@ -272,7 +274,7 @@ let ctx;
 window.project = new Project("Untitled", new Layer("Layer 1"));
 window.camera = new Camera(0.5, 0.5, 1000.0, 500.0);
 
-let presentInput;
+let presentInput, presentInputRange;
 let projectStructureDiv;
 let toolPropertiesDiv;
 
@@ -288,7 +290,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // present
   presentInput = document.querySelector("#present");
+  presentInputRange = document.querySelector("#present-range");
   presentInput.onchange = e => {
+    presentInputRange.value = e.target.value;
+    processFrame(true);
+  };
+  presentInputRange.onchange = e => {
+    presentInput.value = e.target.value;
     processFrame(true);
   };
 
@@ -361,6 +369,7 @@ function loadProject(project) {
   window.project = project;
 
   presentInput.value = project.getLastYear();
+  presentInputRange.max = project.getLastYear();
   renderProjectStructureDiv();
 }
 
@@ -458,12 +467,17 @@ function render(force = false) {
  * @param {boolean} [force] - 강제로 화면을 렌더할지 결정
  */
 export function processFrame(force = false) {
+  ctx.globalAlpha = 1.0;
+
   renderProjectStructureDiv();
   resizeCanvas();
   tick();
   render(force);
 
+  presentInputRange.max = window.project.getLastYear() + 1;
+
   if (nowTool === tools.brush.id) {
+    ctx.globalAlpha = 0.4;
     toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, force);
   }
 }
