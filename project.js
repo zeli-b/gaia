@@ -28,6 +28,16 @@ export class Area {
     container.classList.add("structure-area");
     container.innerText = `${this.name} (${this.color})`;
 
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "area";
+    radio.onclick = () => {
+      document.dispatchEvent(
+        new CustomEvent("selectarea", {detail: {area: this}})
+      );
+    };
+    container.appendChild(radio);
+
     const recolorButton = document.createElement("button");
     recolorButton.style.display = "block";
     recolorButton.innerText = "Change Color";
@@ -64,6 +74,11 @@ export class Area {
     this.id = id;
     return this;
   }
+
+  setParentLayer(parentLayer) {
+    this._parentLayer = parentLayer;
+    return this;
+  }
 }
 
 /**
@@ -83,6 +98,7 @@ export class Structure {
     this.startYear = startYear;
     this.figure = figure;
 
+    this._parentLayer = undefined;
     this._canvas = document.createElement("canvas");
     this._ctx = this._canvas.getContext("2d");
     this._rendered = false;
@@ -126,6 +142,14 @@ export class Structure {
     this._rendered = true;
     this.render(areas, canvas, context, camera, false);
   }
+
+  /**
+   * 동일한 내용의 복제품을 반환
+   * 이때, figure도 복사하여 반환함.
+   */
+  clone(year) {
+    return new Structure(parseFloat(year), this.figure.clone());
+  }
 }
 
 /**
@@ -140,7 +164,9 @@ export class Layer {
   constructor(name, unaffected = false, parentAreaIds = null) {
     this.name = name;
     this.structures = [new Structure(0, new Quadtree(0))];
-    this.areas = {0: new Area("No Name", "transparent").setId(0)};
+    this.areas = {
+      0: new Area("No Name", "transparent").setId(0).setParentLayer(this)
+    };
     this.unaffected = unaffected;
     this.childLayers = [];
     this.lastId = 0;
@@ -214,6 +240,23 @@ export class Layer {
     }
 
     return answer;
+  }
+
+  /**
+   * 연도에 해당하는 구조체가 있다면 그것을 반환하고
+   * 없다면 하나를 생성해서 반환한다.
+   */
+  getStructureByYear(year) {
+    const possible = this.getStructure(year);
+
+    console.log(possible, year);
+    if (possible.startYear === year) {
+      return possible;
+    }
+
+    const newStructure = possible.clone(year);
+    this.addStructure(newStructure);
+    return newStructure;
   }
 
   /**
@@ -368,7 +411,8 @@ export class Layer {
    */
   addArea(area) {
     this.areas[++this.lastId] = area;
-    area.id.setId(this.lastId);
+    area.setId(this.lastId);
+    area._parentLayer = this;
   }
 
   /**

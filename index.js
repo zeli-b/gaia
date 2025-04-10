@@ -90,6 +90,28 @@ const tools = {
       }
     }
   },
+  brush: {
+    id: "brush",
+    label: "brush",
+    adds: {
+      touchend: e => {
+        const touch = e.touches[0];
+        const x = window.camera.convertScreenToMapX(canvas, touch.clientX);
+        const y = window.camera.convertScreenToMapY(canvas, touch.clientY);
+        const radius = 0.1;
+        const area = toolVar.area;
+
+        const year = parseFloat(presentInput.value);
+        const layer = area._parentLayer;
+        const structure = layer.getStructureByYear(year);
+        toolVar.structure = structure;
+
+        structure.figure.drawCircle(x, y, radius, area.id);
+        processFrame(true);
+        console.log("good");
+      }
+    }
+  }
 };
 window.tools = tools;
 let nowTool;
@@ -469,3 +491,8 @@ window.addEventListener("wheel", e => {
     processFrame();
   }
 }, { passive: false });
+
+// 영역 선택 처리
+document.addEventListener("selectarea", e => {
+  toolVar.area = e.detail.area;
+});

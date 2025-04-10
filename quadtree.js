@@ -713,6 +713,13 @@ export class Quadtree {
       this.children[3].toJSON(),
     ];
   }
+
+  /**
+   * 복제품을 만든다
+   */
+  clone() {
+    return parseQuadtree(this.toJSON());
+  }
 }
 
 /**
