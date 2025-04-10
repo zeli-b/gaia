@@ -45,6 +45,8 @@ export class Area {
     deleteButton.style.display = "block";
     deleteButton.innerText = "Remove Area";
     deleteButton.onclick = () => {
+      if (prompt(this.name) !== this.name)
+        return;
       this._removed = true;
       document.dispatchEvent(
         new CustomEvent("processframe", {detail: {force: true}})
