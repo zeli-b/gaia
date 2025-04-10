@@ -110,6 +110,29 @@ const tools = {
         toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5);
         toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5);
         processFrame(true);
+      },
+      mousedown: e => {
+        toolVar.brushing = true;
+      },
+      mouseup: e=> {
+        toolVar.brushing = false;
+      },
+      mousemove: e=> {
+        if(toolVar.brushing == false){ return; }
+        const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
+        const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
+        const x = window.camera.convertScreenToMapX(canvas, cx);
+        const y = window.camera.convertScreenToMapY(canvas, cy);
+        const mx = (x % 1 + 1) % 1;
+        const radius = 0.05;
+        const area = toolVar.area;
+
+        toolVar.areas = area._parentLayer.areas;
+
+        toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5);
+        toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5);
+        toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5);
+        processFrame(true);
       }
     },
     init: () => {
