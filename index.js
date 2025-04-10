@@ -98,6 +98,9 @@ const tools = {
         const touch = e.touches[0];
         const cx = (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (touch.clientY - canvas.offsetTop) * window.devicePixelRatio;
+
+        if (cx > canvas.width || cx < 0) return;
+
         const x = window.camera.convertScreenToMapX(canvas, cx);
         const y = window.camera.convertScreenToMapY(canvas, cy);
         const mx = (x % 1 + 1) % 1;
@@ -123,6 +126,9 @@ const tools = {
       mousemove: e => {
         const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
+
+        if (cx > canvas.width || cx < 0) return;
+
         toolVar.cx = cx;
         toolVar.cy = cy;
 
