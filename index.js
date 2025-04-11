@@ -7,6 +7,10 @@ window.Area = Area;
 window.Layer = Layer;
 window.Structure = Structure;
 
+const COLLISION_OVERLAP = "overlap";
+const COLLISION_EXCLUDE = "exclude";
+const COLLISION_LOSE = "lose";
+
 // 도구 관련 기능들
 const toolVar = {};
 window.toolVar = toolVar;
@@ -152,6 +156,7 @@ const tools = {
       toolVar.structure = new Structure(0, new Quadtree(0));
 
       const sizeRange = document.createElement("input");
+      sizeRange.style.display = "block";
       sizeRange.type = "range";
       sizeRange.min = 0;
       sizeRange.max = 0.2;
@@ -165,18 +170,55 @@ const tools = {
       toolPropertiesDiv.appendChild(sizeRange);
 
       const applyButton = document.createElement("button");
+      applyButton.style.display = "block";
       applyButton.innerText = "Apply";
       applyButton.onclick = () => {
         const year = parseFloat(presentInput.value);
         const change = toolVar.structure;
         const layer = toolVar.area._parentLayer;
+        const strategy = collisionStrategy.value;
 
-        layer.createStructureByYear(year);
-        layer.forEachStructureAfter(year, s => s.figure.overlap(change.figure));
+        const thisYear = layer.createStructureByYear(year);
+        thisYear.figure.overlap(change.figure);
+        let p = thisYear;
+        layer.forEachStructureAfter(year, (s) => {
+          if (strategy === COLLISION_OVERLAP) {
+            s.figure.overlap(change.figure);
+          } else if (strategy === COLLISION_EXCLUDE) {
+            s.figure.excludeOverlap(change.figure);
+          } else if (strategy === COLLISION_LOSE) {
+            const od = p.figure.difference(s.figure);
+            change.figure.exclude(od);
+            s.figure.excludeOverlap(change.figure);
+            p = s;
+          }
+        });
         toolVar.structure = new Structure(0, new Quadtree(0));
         processFrame(true);
       };
       toolPropertiesDiv.appendChild(applyButton);
+
+      const collisionStrategy = document.createElement("select");
+      collisionStrategy.style.display = "block";
+      collisionStrategy.name = "collisionStrategy";
+
+      const option1 = document.createElement("option");
+      option1.innerText = "Overlap";
+      option1.value = COLLISION_OVERLAP;
+      collisionStrategy.appendChild(option1);
+
+      const option2 = document.createElement("option");
+      option2.innerText = "Exclude";
+      option2.value = COLLISION_EXCLUDE;
+      collisionStrategy.appendChild(option2);
+
+      const option3 = document.createElement("option");
+      option3.innerText = "Lose";
+      option3.value = COLLISION_LOSE;
+      collisionStrategy.appendChild(option3);
+
+      collisionStrategy.value = COLLISION_LOSE;
+      toolPropertiesDiv.appendChild(collisionStrategy);
     },
     render: force => {
       const radius = toolVar.radius * window.camera.yZoom;

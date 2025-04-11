@@ -274,6 +274,7 @@ export class Layer {
    * 구조체에 대해 실행하는 콜백
    * @callback StructureCallback
    * @param {Structure} structure - 구조체
+   * @param {Structure} previous - 이전 구조체
    */
 
   /**
@@ -283,15 +284,11 @@ export class Layer {
    */
   forEachStructureAfter(year, callback) {
     const now = this.getStructure(year);
-    if (!now)
-      return;
 
-    let index = this.structures.indexOf(now);
-    if (now.year < year)
-      index++;
+    let index = this.structures.indexOf(now) + 1;
 
     for (; index < this.structures.length; index++) {
-      callback(this.structures[index]);
+      callback(this.structures[index], this.structures[index - 1]);
     }
 
     return this;

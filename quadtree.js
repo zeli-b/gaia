@@ -521,7 +521,8 @@ export class Quadtree {
 
   /**
    * 두 쿼드트리 사이의 차이를 계산.
-   * 일반적으로 overlap의 역연산을 정의
+   * 일반적으로 overlap의 역연산을 정의.
+   * this를 변경하지 않고 새로운 개체를 생성함
    */
   difference(qt, fallbackValue = 0) {
     if (!qt.isDivided()) {
@@ -551,6 +552,29 @@ export class Quadtree {
       result.setChild(i, this.children[i].difference(qt.children[i]));
     }
     return result.reduce();
+  }
+
+  /**
+   * 대상과 겹치는 부분을 제거
+   */
+  exclude(qt, fallbackValue = 0, isZero = v => v === 0) {
+    if (!qt.isDivided()) {
+      if (isZero(qt.getValue()))
+        return this;
+
+      this.value = fallbackValue;
+      this.children = null;
+      return this;
+    }
+
+    if (!this.isDivided())
+      this.divide();
+
+    for (let i = 0; i < 4; i++) {
+      this.children[i].exclude(qt.children[i], fallbackValue, isZero);
+    }
+
+    return this;
   }
 
   /**
