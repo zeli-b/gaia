@@ -219,6 +219,31 @@ const tools = {
         toolVar.structure.figure = diff;
 
         processFrame(true);
+      },
+      mousedown: e => {
+        if (!toolVar.area) return;
+
+        const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
+        const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
+
+        if (cx > canvas.width || cx < 0) return;
+
+        pushUndoStack();
+
+        const x = window.camera.convertScreenToMapX(canvas, cx);
+        const y = window.camera.convertScreenToMapY(canvas, cy);
+
+        const year = parseFloat(presentInput.value);
+        const layer = toolVar.area._parentLayer;
+        const preexist = layer.getStructure(year);
+        const structure = layer.createStructureByYear(year).clone();
+
+        structure.figure.floodFillAt(x, y, toolVar.area.id);
+        const diff = preexist.figure.difference(structure.figure);
+
+        toolVar.structure.figure = diff;
+
+        processFrame(true);
       }
     },
     init: () => {
