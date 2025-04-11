@@ -641,5 +641,13 @@ window.addEventListener("wheel", e => {
 
 // 영역 선택 처리
 document.addEventListener("selectarea", e => {
+  if (
+    toolVar.area
+    && toolVar.area._parentLayer !== e.detail.area._parentLayer
+  ) {
+    toolVar.structure.figure = new Quadtree(0);
+  }
+
   toolVar.area = e.detail.area;
+  processFrame(true);
 });
