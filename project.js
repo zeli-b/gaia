@@ -34,6 +34,7 @@ export class Area {
     radio.name = "area";
     radio.checked = window.toolVar.area === this;
     radio.onclick = () => {
+      document.dispatchEvent(new Event("pushundo"));
       document.dispatchEvent(
         new CustomEvent("selectarea", {detail: {area: this}})
       );
@@ -46,6 +47,7 @@ export class Area {
     recolorButton.onclick = () => {
       const color = prompt("color");
       if (!color) return;
+      document.dispatchEvent(new Event("pushundo"));
       this.color = color;
       document.dispatchEvent(
         new CustomEvent("processframe", {detail: {force: true}})
@@ -59,6 +61,7 @@ export class Area {
     renameButton.onclick = () => {
       const name = prompt("name");
       if (!name) return;
+      document.dispatchEvent(new Event("pushundo"));
       this.name = name;
       document.dispatchEvent(new CustomEvent("processframe"));
     };
@@ -70,6 +73,7 @@ export class Area {
     deleteButton.onclick = () => {
       if (prompt(this.name) !== this.name)
         return;
+      document.dispatchEvent(new Event("pushundo"));
       this._removed = true;
       document.dispatchEvent(
         new CustomEvent("processframe", {detail: {force: true}})
@@ -310,6 +314,7 @@ export class Layer {
     disableToggle.type = "checkbox";
     disableToggle.checked = !this.disabled;
     disableToggle.onchange = e => {
+      document.dispatchEvent(new Event("pushundo"));
       this.disabled = !e.target.checked;
       document.dispatchEvent(
         new CustomEvent("processframe", {detail: {force: true}})
@@ -321,6 +326,7 @@ export class Layer {
     structureToggle.type = "checkbox";
     structureToggle.checked = this.structureVisible;
     structureToggle.onchange = e => {
+      document.dispatchEvent(new Event("pushundo"));
       this.structureVisible = e.target.checked;
       document.dispatchEvent(new CustomEvent("processframe"));
     };
@@ -330,6 +336,7 @@ export class Layer {
     areaToggle.type = "checkbox";
     areaToggle.checked = this.areaVisible;
     areaToggle.onchange = e => {
+      document.dispatchEvent(new Event("pushundo"));
       this.areaVisible = e.target.checked;
       document.dispatchEvent(new CustomEvent("processframe"));
     };
@@ -344,6 +351,7 @@ export class Layer {
     deleteLayerButton.innerText = "Delete";
     deleteLayerButton.onclick = () => {
       if (prompt(this.name) !== this.name) return;
+      document.dispatchEvent(new Event("pushundo"));
       this.removeSelf();
       document.dispatchEvent(
         new CustomEvent("processframe", {detail: {force: true}})
@@ -357,6 +365,8 @@ export class Layer {
     renameLayerButton.onclick = () => {
       const name = prompt("name");
       if (!name) return;
+
+      document.dispatchEvent(new Event("pushundo"));
       this.name = name;
       document.dispatchEvent(new CustomEvent("processframe"));
     };
@@ -395,6 +405,7 @@ export class Layer {
           if (!name) return;
           const color = prompt("color of the area");
           if (!color) return;
+          document.dispatchEvent(new Event("pushundo"));
           const area = new Area(name, color);
           this.addArea(area);
           document.dispatchEvent(new CustomEvent("processframe"));
@@ -526,6 +537,10 @@ export class Project {
     container.appendChild(layerDiv);
 
     return container;
+  }
+
+  clone() {
+    return parseProject(this.stringify());
   }
 }
 

@@ -12,7 +12,7 @@ const COLLISION_EXCLUDE = "exclude";
 const COLLISION_LOSE = "lose";
 
 // 도구 관련 기능들
-const toolVar = {};
+let toolVar = {};
 window.toolVar = toolVar;
 const tools = {
   span: {
@@ -98,6 +98,9 @@ const tools = {
     id: "brush",
     label: "brush",
     adds: {
+      touchstart: () => {
+        pushUndoStack();
+      },
       touchmove: e => {
         const touch = e.touches[0];
         const cx = (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
@@ -124,9 +127,7 @@ const tools = {
       },
       mousedown: e => {
         toolVar.brushing = true;
-      },
-      mouseup: e => {
-        toolVar.brushing = false;
+        pushUndoStack();
       },
       mousemove: e => {
         const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
@@ -152,6 +153,9 @@ const tools = {
         toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5, depth);
         toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5, depth);
         processFrame();
+      },
+      mouseup: e => {
+        toolVar.brushing = false;
       }
     },
     init: () => {
@@ -198,6 +202,8 @@ const tools = {
         const cy = (touch.clientY - canvas.offsetTop) * window.devicePixelRatio;
 
         if (cx > canvas.width || cx < 0) return;
+
+        pushUndoStack();
 
         const x = window.camera.convertScreenToMapX(canvas, cx);
         const y = window.camera.convertScreenToMapY(canvas, cy);
@@ -395,6 +401,13 @@ const topbar = [
     label: "Process Frame",
     onclick: () => {
       processFrame(true);
+    }
+  },
+  {
+    id: "undo",
+    label: "Undo",
+    onclick: () => {
+      popUndoStack();
     }
   },
 ];
@@ -705,3 +718,24 @@ document.addEventListener("selectarea", e => {
   toolVar.area = e.detail.area;
   processFrame(true);
 });
+
+// 실행취소 되돌리기 기능
+const undoStack = [];
+const undoCount = 20;
+
+function pushUndoStack() {
+  if (undoStack.length >= undoCount) {
+    undoStack.splice(0, 1);
+  }
+
+  undoStack.push([project.clone(), {...toolVar}]);
+}
+document.addEventListener("pushundo", pushUndoStack);
+
+function popUndoStack() {
+  if (undoStack.length <= 0) return;
+  
+  [window.project, toolVar] = undoStack.pop();
+  window.toolVar = toolVar;
+  processFrame(true);
+}
