@@ -155,7 +155,7 @@ const tools = {
       }
     },
     init: () => {
-      toolVar.structure = new Structure(0, new Quadtree(0));
+      toolVar.structure = new Structure(0, new Quadtree(null));
 
       const sizeRange = document.createElement("input");
       sizeRange.style.display = "block";
@@ -183,21 +183,22 @@ const tools = {
         const strategy = collisionStrategy.value;
 
         const thisYear = layer.createStructureByYear(year);
-        thisYear.figure.overlap(change.figure);
+        const isNull = c => c === null;
+        thisYear.figure.overlap(change.figure, isNull);
         let p = thisYear;
         layer.forEachStructureAfter(year, (s) => {
           if (strategy === COLLISION_OVERLAP) {
-            s.figure.overlap(change.figure);
+            s.figure.overlap(change.figure, isNull);
           } else if (strategy === COLLISION_EXCLUDE) {
-            s.figure.excludeOverlap(change.figure);
+            s.figure.excludeOverlap(change.figure, 0, isNull);
           } else if (strategy === COLLISION_LOSE) {
-            const od = p.figure.difference(s.figure);
-            change.figure.exclude(od);
-            s.figure.excludeOverlap(change.figure);
+            const od = p.figure.difference(s.figure, null);
+            change.figure.exclude(od, 0, isNull);
+            s.figure.excludeOverlap(change.figure, 0, isNull);
             p = s;
           }
         });
-        change.figure = new Quadtree(0);
+        change.figure = new Quadtree(null);
         processFrame(true);
       };
       toolPropertiesDiv.appendChild(applyButton);
@@ -649,7 +650,7 @@ document.addEventListener("selectarea", e => {
     toolVar.area
     && toolVar.area._parentLayer !== e.detail.area._parentLayer
   ) {
-    toolVar.structure.figure = new Quadtree(0);
+    toolVar.structure.figure = new Quadtree(null);
   }
 
   toolVar.area = e.detail.area;
