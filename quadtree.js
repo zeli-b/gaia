@@ -265,7 +265,7 @@ export class Quadtree {
     const ldc = Math.hypot((x - 0) / ellipseRate, y - 1) < radius;
     const rdc = Math.hypot((x - 1) / ellipseRate, y - 1) < radius;
 
-    if ([luc, ruc, ldc, rdc].every(i => i)) {
+    if (luc && ruc && ldc && rdc) {
       this.value = value;
       this.children = null;
       return this;

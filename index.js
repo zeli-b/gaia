@@ -116,10 +116,11 @@ const tools = {
 
         toolVar.areas = area._parentLayer.areas;
 
-        toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5);
-        toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5);
-        toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5);
-        processFrame(true);
+        const depth = Math.round(Math.log2(window.camera.xZoom));
+        toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5, depth);
+        toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5, depth);
+        toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5, depth);
+        processFrame();
       },
       mousedown: e => {
         toolVar.brushing = true;
@@ -146,10 +147,11 @@ const tools = {
 
         toolVar.areas = area._parentLayer.areas;
 
-        toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5);
-        toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5);
-        toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5);
-        processFrame(true);
+        const depth = Math.round(Math.log2(window.camera.xZoom));
+        toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5, depth);
+        toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5, depth);
+        toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5, depth);
+        processFrame();
       }
     },
     init: () => {
@@ -158,11 +160,13 @@ const tools = {
       const sizeRange = document.createElement("input");
       sizeRange.style.display = "block";
       sizeRange.type = "range";
-      sizeRange.min = 0;
-      sizeRange.max = 0.2;
-      sizeRange.step = 0.001;
+      sizeRange.min = 4;
+      sizeRange.max = 200;
+      sizeRange.step = 1;
+      sizeRange.value = 16;
+      toolVar.radius = sizeRange.value / window.camera.yZoom;
       sizeRange.onchange = e => {
-        toolVar.radius = e.target.value;
+        toolVar.radius = sizeRange.value / window.camera.yZoom;
         toolVar.cx = canvas.width / 2;
         toolVar.cy = canvas.height / 2;
         processFrame();
@@ -193,7 +197,7 @@ const tools = {
             p = s;
           }
         });
-        toolVar.structure = new Structure(0, new Quadtree(0));
+        change.figure = new Quadtree(0);
         processFrame(true);
       };
       toolPropertiesDiv.appendChild(applyButton);
@@ -227,7 +231,7 @@ const tools = {
       ctx.stroke();
 
       ctx.globalAlpha = 0.4;
-      toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, force);
+      toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, true);
     }
   }
 };
