@@ -724,6 +724,68 @@ export class Quadtree {
     return this;
   }
 
+  drawMergedOutline(canvas, ctx, depth = DEFAULT_DEPTH) {
+    const cells = [];
+    const edges = new Set();
+
+    // 리프 노드 수집
+    this.collectLeafNodes(0, 0, 1, cells);
+
+    // 빨간색 경계선 (값이 다른 리프 노드 사이)
+    const hmap = new Map();
+    const vmap = new Map();
+
+    for (const { x0, y0, size, node } of cells) {
+      const v = node.value;
+
+      function addEdge(map, key, start, len, value) {
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push({ start, len, value });
+      }
+
+      addEdge(hmap, y0, x0, size, v);
+      addEdge(hmap, y0 + size, x0, size, v);
+      addEdge(vmap, x0, y0, size, v);
+      addEdge(vmap, x0 + size, y0, size, v);
+    }
+
+    function findEdges(map, isVertical) {
+      const redEdges = [];
+      for (const [key, entries] of map.entries()) {
+        entries.sort((a, b) => a.start - b.start);
+        for (let i = 0; i < entries.length; i++) {
+          const e1 = entries[i];
+          for (let j = i + 1; j < entries.length; j++) {
+            const e2 = entries[j];
+            if (e2.start >= e1.start + e1.len) break;
+            if (e1.value !== e2.value) {
+              const from = Math.max(e1.start, e2.start);
+              const to = Math.min(e1.start + e1.len, e2.start + e2.len);
+              const fx = isVertical ? key : from;
+              const fy = isVertical ? from : key;
+              const tx = isVertical ? key : to;
+              const ty = isVertical ? to : key;
+              redEdges.push({ fx, fy, tx, ty });
+            }
+          }
+        }
+      }
+      return redEdges;
+    }
+
+    const redLines = [
+      ...findEdges(hmap, false),
+      ...findEdges(vmap, true)
+    ];
+
+    for (const { fx, fy, tx, ty } of redLines) {
+      ctx.beginPath();
+      ctx.moveTo(fx * canvas.width, fy * canvas.height);
+      ctx.lineTo(tx * canvas.width, ty * canvas.height);
+      ctx.stroke();
+    }
+  }
+
   /**
    * 쿼드트리가 비어있는지 확인
    * @param {number} [withValue] - 이것으로 쿼드트리가 가득차있는지 확인

@@ -151,6 +151,9 @@ export class Structure {
     this._canvas.width = Math.pow(2, this.figure.getDepth());
     this._canvas.height = this._canvas.width;
     this.figure.render(areas, this._canvas, this._ctx);
+    this._ctx.strokeStyle = "black";
+    this._ctx.lineWidth = 1;
+    this.figure.drawMergedOutline(this._canvas, this._ctx);
     this._rendered = true;
     this.render(areas, canvas, context, camera, false);
   }
