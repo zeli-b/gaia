@@ -577,6 +577,110 @@ export class Quadtree {
     return this;
   }
 
+  floodFillAt(x, y, newValue) {
+    const { node: startNode, x0, y0, size } = this.findLeafAt(x, y);
+    const originalValue = startNode.value;
+    if (originalValue === newValue) return this;
+
+    const queue = [{ node: startNode, x0, y0, size }];
+    const visited = new Set();
+
+    while (queue.length > 0) {
+      const { node, x0, y0, size } = queue.shift();
+      const key = `${x0},${y0},${size}`;
+      if (visited.has(key)) continue;
+      visited.add(key);
+
+      if (node.value !== originalValue) continue;
+
+      node.value = newValue;
+
+      const neighbors = this.findAdjacentLeaves(node, x0, y0, size);
+      for (const neighbor of neighbors) {
+        const nk = `${neighbor.x0},${neighbor.y0},${neighbor.size}`;
+        if (!visited.has(nk) && neighbor.node.value === originalValue) {
+          queue.push(neighbor);
+        }
+      }
+    }
+
+    return this;
+  }
+
+  findLeafAt(x, y, x0 = 0, y0 = 0, size = 1) {
+    if (!this.isDivided()) {
+      return { node: this, x0, y0, size };
+    }
+
+    const half = size / 2;
+    const midX = x0 + half;
+    const midY = y0 + half;
+
+    if (x < midX && y < midY) {
+      return this.children[0].findLeafAt(x, y, x0, y0, half);
+    } else if (x >= midX && y < midY) {
+      return this.children[1].findLeafAt(x, y, midX, y0, half);
+    } else if (x < midX && y >= midY) {
+      return this.children[2].findLeafAt(x, y, x0, midY, half);
+    } else {
+      return this.children[3].findLeafAt(x, y, midX, midY, half);
+    }
+  }
+
+  collectLeafNodes(x0 = 0, y0 = 0, size = 1, result = []) {
+    if (!this.isDivided()) {
+      result.push({ node: this, x0, y0, size });
+      return result;
+    }
+
+    const half = size / 2;
+    this.children[0].collectLeafNodes(x0, y0, half, result);
+    this.children[1].collectLeafNodes(x0 + half, y0, half, result);
+    this.children[2].collectLeafNodes(x0, y0 + half, half, result);
+    this.children[3].collectLeafNodes(x0 + half, y0 + half, half, result);
+
+    return result;
+  }
+
+  findAdjacentLeaves(targetNode, x0, y0, size) {
+    const neighbors = [];
+    const allLeaves = this.collectLeafNodes();
+
+    for (const { node, x0: nx, y0: ny, size: nsize } of allLeaves) {
+      if (node === targetNode) continue;
+
+      const touches =
+        (Math.abs(x0 - (nx + nsize)) < 1e-10 || Math.abs((x0 + size) - nx) < 1e-10) &&
+        !(y0 + size <= ny || y0 >= ny + nsize) ||
+        (Math.abs(y0 - (ny + nsize)) < 1e-10 || Math.abs((y0 + size) - ny) < 1e-10) &&
+        !(x0 + size <= nx || x0 >= nx + nsize);
+
+      if (touches) {
+        neighbors.push({ node, x0: nx, y0: ny, size: nsize });
+      }
+    }
+
+    return neighbors;
+  }
+
+  /**
+   * 좌표에 해당하는 리프 노드의 값을 반환
+   * @param {number} x
+   * @param {number} y
+   * @returns {any}
+   */
+  getValueAt(x, y) {
+    if (!this.isDivided()) {
+      return this.value;
+    }
+
+    const half = 0.5;
+    if (x < half && y < half) return this.children[0].getValueAt(x * 2, y * 2);       // LU
+    if (x >= half && y < half) return this.children[1].getValueAt((x - half) * 2, y * 2); // RU
+    if (x < half && y >= half) return this.children[2].getValueAt(x * 2, (y - half) * 2); // LD
+    return this.children[3].getValueAt((x - half) * 2, (y - half) * 2);              // RD
+  }
+
   /**
    * 쿼드트리를 화면에 보일 수 있게 렌더링한다
    * @param {object} areas - 각 색상에 대한 정보

@@ -101,6 +101,21 @@ function quadtreeTest4() {
   console.log(JSON.stringify(result.toJSON()));
 }
 
+function quadtreeTest5() {
+  const qt = new Quadtree(0);
+
+  qt.drawCircle(0.5, 0.5, 0.5, 1);
+  qt.drawCircle(0.5, 0.5, 0.4, 0);
+  qt.drawCircle(0.5, 0.5, 0.3, 1);
+  qt.drawCircle(0.5, 0.5, 0.2, 0);
+
+  qt.floodFillAt(0.5, 0.15, 2);
+
+  console.log(JSON.stringify(qt.toJSON()));
+}
+
+quadtreeTest5();
+
 /**
  * 프로젝트 전체 테스트
  * - 지형, 날씨, 국가 레이어 구성 및 구조체 생성
@@ -197,5 +212,3 @@ function projectTest3() {
     console.log(proj.stringify());
   })
 }
-
-projectTest3();
