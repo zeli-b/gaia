@@ -488,7 +488,7 @@ export class Quadtree {
   excludeOverlap(qt, fallbackValue = 0, isZero = v => v === 0) {
     if (!qt.isDivided()) {
       if (isZero(qt.value)) {
-        return;
+        return this;
       }
 
       if (!this.isDivided()) {
@@ -498,7 +498,6 @@ export class Quadtree {
           this.value = fallbackValue;
         }
 
-        this.children = null;
         return this;
       }
 
@@ -506,7 +505,7 @@ export class Quadtree {
         this.children[i].excludeOverlap(qt, fallbackValue, isZero);
       }
 
-      return this;
+      return this.reduce();
     }
 
     if (!this.isDivided())

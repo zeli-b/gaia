@@ -148,7 +148,7 @@ export class Structure {
       return;
     }
 
-    this._canvas.width = Math.pow(2, this.figure.getDepth());
+    this._canvas.width = Math.min(Math.pow(2, this.figure.getDepth()), 4096);
     this._canvas.height = this._canvas.width;
     this.figure.render(areas, this._canvas, this._ctx);
     this._ctx.strokeStyle = "black";
