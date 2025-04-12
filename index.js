@@ -137,6 +137,7 @@ const tools = {
 
         toolVar.cx = cx;
         toolVar.cy = cy;
+        processFrame();
 
         if (!toolVar.brushing) return;
 
