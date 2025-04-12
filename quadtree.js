@@ -430,7 +430,7 @@ export class Quadtree {
    * @param {function(any): boolean} [isZero] - 마스킹 조건 판별 함수
    * @returns {Quadtree}
    */
-  mask(binaryQuadtree, fallbackValue, isZero = v => v === 0) {
+  mask(binaryQuadtree, fallbackValue = 0, isZero = v => v === 0) {
     if (!binaryQuadtree.isDivided()) {
       if (isZero(binaryQuadtree.value)) {
         this.value = fallbackValue;
@@ -485,14 +485,14 @@ export class Quadtree {
    * @param {function(any): boolean} [isZero] - 비교 조건
    * @returns {Quadtree}
    */
-  excludeOverlap(qt, fallbackValue = 0, isZero = v => v === 0) {
+  excludeOverlap(qt, fallbackValue = 0, isZero = v => v === 0, valueIsZero = v => v === 0) {
     if (!qt.isDivided()) {
       if (isZero(qt.value)) {
         return this;
       }
 
       if (!this.isDivided()) {
-        if (isZero(this.value)) {
+        if (valueIsZero(this.value)) {
           this.value = qt.value;
         } else {
           this.value = fallbackValue;
@@ -523,7 +523,7 @@ export class Quadtree {
    * 일반적으로 overlap의 역연산을 정의.
    * this를 변경하지 않고 새로운 개체를 생성함
    */
-  difference(qt, fallbackValue = 0) {
+  difference(qt, fallbackValue = null) {
     if (!qt.isDivided()) {
       if (!this.isDivided()) {
         if (qt.getValue() === this.getValue()) {

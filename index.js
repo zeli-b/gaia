@@ -258,7 +258,7 @@ const tools = {
 };
 window.tools = tools;
 
-function addStructureApplyButton(collisionStrategy) {
+function addStructureApplyButton() {
   const applyButton = document.createElement("button");
   applyButton.style.display = "block";
   applyButton.innerText = "Apply";
@@ -266,12 +266,13 @@ function addStructureApplyButton(collisionStrategy) {
     const year = parseFloat(presentInput.value);
     const change = toolVar.structure;
     const layer = toolVar.area._parentLayer;
-    const strategy = collisionStrategy.value;
+    const strategy = toolVar.collisionStrategy;
 
     const thisYear = layer.createStructureByYear(year);
     const isNull = c => c === null;
+    const isNotNull = c => c !== null;
+    let p = thisYear.clone();
     thisYear.figure.overlap(change.figure, isNull);
-    let p = thisYear;
     layer.forEachStructureAfter(year, (s) => {
       if (strategy === COLLISION_OVERLAP) {
         s.figure.overlap(change.figure, isNull);
@@ -279,8 +280,8 @@ function addStructureApplyButton(collisionStrategy) {
         s.figure.excludeOverlap(change.figure, 0, isNull);
       } else if (strategy === COLLISION_LOSE) {
         const od = p.figure.difference(s.figure, null);
-        change.figure.exclude(od, 0, isNull);
-        s.figure.excludeOverlap(change.figure, 0, isNull);
+        change.figure.mask(od, null, isNotNull);
+        s.figure.overlap(change.figure, isNull);
         p = s;
       }
     });
@@ -295,6 +296,9 @@ function addCollisionStrategySelect() {
   const collisionStrategy = document.createElement("select");
   collisionStrategy.style.display = "block";
   collisionStrategy.name = "collisionStrategy";
+  collisionStrategy.onchange = () => {
+    toolVar.collisionStrategy = collisionStrategy.value;
+  };
 
   const option1 = document.createElement("option");
   option1.innerText = "Overlap";
@@ -312,6 +316,7 @@ function addCollisionStrategySelect() {
   collisionStrategy.appendChild(option3);
 
   collisionStrategy.value = COLLISION_LOSE;
+  toolVar.collisionStrategy = collisionStrategy.value;
   toolPropertiesDiv.appendChild(collisionStrategy);
 
   return collisionStrategy;
