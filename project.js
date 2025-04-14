@@ -199,6 +199,7 @@ export class Layer {
     this.disabled = false;
     this.structureVisible = true;
     this.areaVisible = true;
+    this.opacity = 1.0;
     this._removed = false;
   }
 
@@ -217,6 +218,7 @@ export class Layer {
     const structure = this.getStructure(year);
 
     if (structure) {
+      context.globalAlpha = this.opacity;
       structure.render(this.areas, canvas, context, camera, force);
     }
 
@@ -351,6 +353,21 @@ export class Layer {
     const realTitle = document.createElement("span");
     realTitle.innerText = this.name;
     layerTitle.appendChild(realTitle);
+
+    const opacityRange = document.createElement("input");
+    opacityRange.style.display = "block";
+    opacityRange.type = "range";
+    opacityRange.min = 0.0;
+    opacityRange.max = 1.0;
+    opacityRange.step = 0.01;
+    opacityRange.value = this.opacity;
+    opacityRange.onchange = () => {
+      this.opacity = Number(opacityRange.value);
+      document.dispatchEvent(
+        new CustomEvent("processframe", {detail: {force: true}})
+      );
+    }
+    layerTitle.appendChild(opacityRange);
 
     const deleteLayerButton = document.createElement("button");
     deleteLayerButton.style.display = "block";
@@ -575,6 +592,7 @@ export function parseProject(json) {
       layerData.name, layerData.unaffected, layerData.parentAreaIds
     );
     layer.lastId = layerData.lastId;
+    layer.opacity = layerData.opacity;
     layer.areas = {};
     layer.structures = [];
 
