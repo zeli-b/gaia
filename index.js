@@ -564,10 +564,14 @@ function render(force = false) {
   ctx.fillStyle = "lightgrey";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "grey";
-  for (let x = 0; x < canvas.width; x += 20)
-    for (let y = 0; y < canvas.height; y += 20) {
-      ctx.fillRect(x, y, 10, 10);
-      ctx.fillRect(x + 10, y + 10, 10, 10);
+  const transparentSize = 5 * window.devicePixelRatio;
+  for (let x = 0; x < canvas.width; x += transparentSize * 2)
+    for (let y = 0; y < canvas.height; y += transparentSize * 2) {
+      ctx.fillRect(x, y, transparentSize, transparentSize);
+      ctx.fillRect(
+        x + transparentSize, y + transparentSize,
+        transparentSize, transparentSize
+      );
     }
 
   window.camera.updateOnlyChild(canvas);
