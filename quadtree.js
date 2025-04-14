@@ -701,7 +701,7 @@ export class Quadtree {
       const color = areas[this.getValue()].color;
 
       context.fillStyle = color;
-      context.fillRect(dx, dy, size, size);
+      context.fillRect(dx, dy, size + 1, size + 1);
       return this;
     }
 

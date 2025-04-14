@@ -161,7 +161,7 @@ export class Structure {
       if (!figure.isDivided()) break;
       figure = figure.children[camera.onlyChild[i]];
     }
-    const depth = Math.log2(camera.yZoom);
+    const depth = Math.log2(camera.xZoom) - camera.onlyChild.length;
     figure.render(areas, this._canvas, this._ctx, depth);
     this._rendered = true;
 
