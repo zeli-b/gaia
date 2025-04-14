@@ -691,10 +691,10 @@ export class Quadtree {
    * @param {number} dy - 배치 위치 오프셋
    * @returns {Quadtree}
    */
-  render(areas, canvas, context, dx = 0, dy = 0, depth = 0) {
+  render(areas, canvas, context, maxDepth = DEFAULT_DEPTH, dx = 0, dy = 0, depth = 0) {
     const size = canvas.width / Math.pow(2, depth);
 
-    if (!this.isDivided()) {
+    if (!this.isDivided() || maxDepth <= 0) {
       if (this.getValue() === null)
         return;
 
@@ -706,18 +706,19 @@ export class Quadtree {
     }
 
     depth++;
+    maxDepth--;
     const half = size / 2;
     this.children[0].render(
-      areas, canvas, context, dx, dy, depth
+      areas, canvas, context, maxDepth, dx, dy, depth
     );
     this.children[1].render(
-      areas, canvas, context, dx+half, dy, depth
+      areas, canvas, context, maxDepth, dx+half, dy, depth
     );
     this.children[2].render(
-      areas, canvas, context, dx, dy+half, depth
+      areas, canvas, context, maxDepth, dx, dy+half, depth
     );
     this.children[3].render(
-      areas, canvas, context, dx+half, dy+half, depth
+      areas, canvas, context, maxDepth, dx+half, dy+half, depth
     );
 
     return this;

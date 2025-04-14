@@ -570,6 +570,12 @@ function render(force = false) {
       ctx.fillRect(x + 10, y + 10, 10, 10);
     }
 
+  window.camera.updateOnlyChild(canvas);
+  if (window.camera.update) {
+    force = true;
+    window.camera.update = false;
+  }
+  
   // render project
   const year = presentInput.value;
   window.project.render(year, canvas, ctx, window.camera, force);

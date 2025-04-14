@@ -14,6 +14,68 @@ export class Camera {
     this.y = y;
     this.xZoom = xZoom;
     this.yZoom = yZoom;
+    this.dx = 0;
+    this.dy = 0;
+    this.onlyChild = [];
+    this.update = false;
+  }
+
+  updateOnlyChild(canvas) {
+    const sx = this.convertScreenToMapX(canvas, 0);
+    const sy = this.convertScreenToMapY(canvas, 0);
+    const ex = this.convertScreenToMapX(canvas, canvas.width);
+    const ey = this.convertScreenToMapY(canvas, canvas.height)
+    const original = JSON.stringify(this.onlyChild);
+
+    this.dx = 0;
+    this.dy = 0;
+    this.onlyChild.length = 0;
+    while (true) {
+      const size = Math.pow(0.5, this.onlyChild.length);
+      const half = size / 2;
+
+      if (
+        this.dx <= sx && ex < this.dx + half
+        && this.dy <= sy && ey < this.dy + half
+      ) {
+        this.onlyChild.push(0);
+        continue;
+      }
+
+      if (
+        this.dx + half <= sx && ex < this.dx + size
+        && this.dy <= sy && ey < this.dy + half
+      ) {
+        this.onlyChild.push(1);
+        this.dx += half;
+        continue;
+      }
+
+      if (
+        this.dx <= sx && ex < this.dx + half
+        && this.dy + half <= sy && ey < this.dy + size
+      ) {
+        this.onlyChild.push(2);
+        this.dy += half;
+        continue;
+      }
+
+      if (
+        this.dx + half <= sx && ex < this.dx + size
+        && this.dy + half <= sy && ey < this.dy + size
+      ) {
+        this.onlyChild.push(3);
+        this.dx += half;
+        this.dy += half;
+        continue;
+      }
+
+      break;
+    }
+
+    if (original !== JSON.stringify(this.onlyChild)) {
+      this.update = true;
+    }
   }
 
   /**
@@ -82,7 +144,11 @@ export class Camera {
    * @returns {Camera}
    */
   setXZoom(zoom) {
+    const original = this.xZoom;
     this.xZoom = Math.max(Math.min(zoom, 2000000), 2);
+
+    this.update = this.update
+      || Math.floor(Math.log2(this.xZoom)) !== Math.floor(Math.log2(original));
     return this;
   }
 
@@ -92,7 +158,11 @@ export class Camera {
    * @returns {Camera}
    */
   setYZoom(zoom) {
+    const original = this.yZoom;
     this.yZoom = Math.max(Math.min(zoom, 1000000), 1);
+
+    this.update = this.update ||
+      Math.floor(Math.log2(this.yZoom)) !== Math.floor(Math.log2(original));
     return this;
   }
 }

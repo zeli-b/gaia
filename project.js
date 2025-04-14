@@ -142,23 +142,33 @@ export class Structure {
    */
   render(areas, canvas, context, camera, force = false) {
     if (this._rendered && !force) {
-      const left = camera.convertMapToScreenX(canvas, 0) % camera.xZoom
+      const left = camera.convertMapToScreenX(canvas, camera.dx) % camera.xZoom
         - camera.xZoom;
-      const up = camera.convertMapToScreenY(canvas, 0);
+      const up = camera.convertMapToScreenY(canvas, camera.dy);
       context.imageSmoothingEnabled = false;
+      const width = camera.xZoom / Math.pow(2, camera.onlyChild.length);
+      const height = camera.yZoom / Math.pow(2, camera.onlyChild.length);
       for (let x = left; x < canvas.width; x += camera.xZoom) {
-        context.drawImage(this._canvas, x, up, camera.xZoom, camera.yZoom);
+        context.drawImage(this._canvas, x, up, width, height);
       }
       return;
     }
 
     this._canvas.width = Math.min(Math.pow(2, this.figure.getDepth()), 4096);
     this._canvas.height = this._canvas.width;
-    this.figure.render(areas, this._canvas, this._ctx);
+    let figure = this.figure;
+    for (let i = 0; i < camera.onlyChild.length; i++) {
+      if (!figure.isDivided()) break;
+      figure = figure.children[camera.onlyChild[i]];
+    }
+    const depth = Math.log2(camera.yZoom);
+    figure.render(areas, this._canvas, this._ctx, depth);
+
     this._ctx.strokeStyle = "black";
     this._ctx.lineWidth = 1;
     this.figure.drawMergedOutline(this._canvas, this._ctx);
     this._rendered = true;
+
     this.render(areas, canvas, context, camera, false);
   }
 
