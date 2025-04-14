@@ -574,47 +574,92 @@ function render(force = false) {
   const year = presentInput.value;
   window.project.render(year, canvas, ctx, window.camera, force);
 
-  // render 경도선, 위도선
-  
-  // 적도선
-  ctx.strokeStyle = "red";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 0.5));
-  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 0.5));
-  ctx.stroke();
-  
-  // 북위 30도선
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 1 / 3));
-  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 1 / 3));
-  ctx.stroke();
+  drawParallels();
 
-  // 북위 60도선
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 1 / 6));
-  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 1 / 6));
-  ctx.stroke();
+  // tool render
+  if (nowTool) {
+    const renderCallback = tools[nowTool].render;
+    if (renderCallback) renderCallback(force);
+  }
+}
 
-  // 남위 30도선
-  ctx.strokeStyle = "black";
+/* render 경도선, 위도선
+ */
+function drawParallels() {
   ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 2 / 3));
-  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 2 / 3));
-  ctx.stroke();
 
-  // 남위 60도선
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 5 / 6));
-  ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 5 / 6));
-  ctx.stroke();
+  // 촘촘한 위도선
+  const deltaY = Math.pow(
+    10, Math.round(Math.log10(canvas.height / window.camera.yZoom) + 1.7));
+  if (deltaY < 100) {
+    ctx.strokeStyle = "black";
+    for (let y = 0; y <= 180; y += deltaY) {
+      const screenY = window.camera.convertMapToScreenY(canvas, y / 180);
+      if (screenY < 0)
+        continue;
+      if (screenY > canvas.height)
+        break;
+      ctx.beginPath();
+      ctx.moveTo(0, screenY);
+      ctx.lineTo(canvas.width, screenY);
+      ctx.stroke();
+    }
+
+    for (let y = 0; ; y += deltaY) {
+      const screenY = window.camera.convertMapToScreenX(canvas, y / 360);
+      if (screenY < 0)
+        continue;
+      if (screenY > canvas.width)
+        break;
+
+      ctx.beginPath();
+      ctx.moveTo(screenY, 0);
+      ctx.lineTo(screenY, canvas.height);
+      ctx.stroke();
+    }
+  }
+
+  // 위도선
+  {
+    // 적도선
+    ctx.strokeStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 0.5));
+    ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 0.5));
+    ctx.stroke();
+    
+    // 북위 30도선
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 1 / 3));
+    ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 1 / 3));
+    ctx.stroke();
+
+    // 북위 60도선
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 1 / 6));
+    ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 1 / 6));
+    ctx.stroke();
+
+    // 남위 30도선
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 2 / 3));
+    ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 2 / 3));
+    ctx.stroke();
+
+    // 남위 60도선
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 5 / 6));
+    ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 5 / 6));
+    ctx.stroke();
+  }
 
   // 경도선
   const start = Math.floor(window.camera.convertScreenToMapX(canvas, 0)) * 12;
@@ -632,12 +677,6 @@ function render(force = false) {
     ctx.moveTo(sx, yStart);
     ctx.lineTo(sx, yEnd);
     ctx.stroke();
-  }
-
-  // tool render
-  if (nowTool) {
-    const renderCallback = tools[nowTool].render;
-    if (renderCallback) renderCallback(force);
   }
 }
 
