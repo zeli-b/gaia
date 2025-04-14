@@ -163,10 +163,6 @@ export class Structure {
     }
     const depth = Math.log2(camera.yZoom);
     figure.render(areas, this._canvas, this._ctx, depth);
-
-    this._ctx.strokeStyle = "black";
-    this._ctx.lineWidth = 1;
-    this.figure.drawMergedOutline(this._canvas, this._ctx);
     this._rendered = true;
 
     this.render(areas, canvas, context, camera, false);
