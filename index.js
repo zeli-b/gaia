@@ -96,34 +96,14 @@ const tools = {
   },
   brush: {
     id: "brush",
-    label: "brush",
+    label: "Brush",
     adds: {
-      touchstart: () => {
-        pushUndoStack();
-      },
       touchmove: e => {
         const touch = e.touches[0];
         const cx = (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (touch.clientY - canvas.offsetTop) * window.devicePixelRatio;
 
-        if (cx > canvas.width || cx < 0) return;
-
-        const x = window.camera.convertScreenToMapX(canvas, cx);
-        const y = window.camera.convertScreenToMapY(canvas, cy);
-        const mx = (x % 1 + 1) % 1;
-        const radius = toolVar.radius;
-        const area = toolVar.area;
-
-        toolVar.cx = cx;
-        toolVar.cy = cy;
-
-        toolVar.areas = area._parentLayer.areas;
-
-        const depth = Math.round(Math.log2(window.camera.xZoom));
-        toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5, depth);
-        toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5, depth);
-        toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5, depth);
-        processFrame();
+        drawBrush(cx, cy);
       },
       mousedown: e => {
         toolVar.brushing = true;
@@ -132,28 +112,12 @@ const tools = {
       mousemove: e => {
         const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
-
-        if (cx > canvas.width || cx < 0) return;
-
         toolVar.cx = cx;
         toolVar.cy = cy;
-        processFrame();
 
         if (!toolVar.brushing) return;
 
-        const x = window.camera.convertScreenToMapX(canvas, cx);
-        const y = window.camera.convertScreenToMapY(canvas, cy);
-        const mx = (x % 1 + 1) % 1;
-        const radius = toolVar.radius;
-        const area = toolVar.area;
-
-        toolVar.areas = area._parentLayer.areas;
-
-        const depth = Math.round(Math.log2(window.camera.xZoom));
-        toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5, depth);
-        toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5, depth);
-        toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5, depth);
-        processFrame();
+        drawBrush(cx, cy);
       },
       mouseup: e => {
         toolVar.brushing = false;
@@ -178,8 +142,8 @@ const tools = {
       };
       toolPropertiesDiv.appendChild(sizeRange);
 
-      const cs = addCollisionStrategySelect();
-      addStructureApplyButton(cs);
+      addCollisionStrategySelect();
+      addStructureApplyButton();
     },
     render: force => {
       const radius = toolVar.radius * window.camera.yZoom;
@@ -202,24 +166,7 @@ const tools = {
         const cx = (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (touch.clientY - canvas.offsetTop) * window.devicePixelRatio;
 
-        if (cx > canvas.width || cx < 0) return;
-
-        pushUndoStack();
-
-        const x = window.camera.convertScreenToMapX(canvas, cx);
-        const y = window.camera.convertScreenToMapY(canvas, cy);
-
-        const year = parseFloat(presentInput.value);
-        const layer = toolVar.area._parentLayer;
-        const preexist = layer.getStructure(year);
-        const structure = layer.createStructureByYear(year).clone();
-
-        structure.figure.floodFillAt(x, y, toolVar.area.id);
-        const diff = preexist.figure.difference(structure.figure);
-
-        toolVar.structure.figure = diff;
-
-        processFrame(true);
+        drawPaint(cx, cy);
       },
       mousedown: e => {
         if (!toolVar.area) return;
@@ -227,24 +174,7 @@ const tools = {
         const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
 
-        if (cx > canvas.width || cx < 0) return;
-
-        pushUndoStack();
-
-        const x = window.camera.convertScreenToMapX(canvas, cx);
-        const y = window.camera.convertScreenToMapY(canvas, cy);
-
-        const year = parseFloat(presentInput.value);
-        const layer = toolVar.area._parentLayer;
-        const preexist = layer.getStructure(year);
-        const structure = layer.createStructureByYear(year).clone();
-
-        structure.figure.floodFillAt(x, y, toolVar.area.id);
-        const diff = preexist.figure.difference(structure.figure);
-
-        toolVar.structure.figure = diff;
-
-        processFrame(true);
+        drawPaint(cx, cy);
       }
     },
     init: () => {
@@ -258,6 +188,48 @@ const tools = {
   }
 };
 window.tools = tools;
+
+function drawPaint(cx, cy) {
+  if (cx > canvas.width || cx < 0) return;
+
+  pushUndoStack();
+
+  const x = window.camera.convertScreenToMapX(canvas, cx);
+  const y = window.camera.convertScreenToMapY(canvas, cy);
+
+  const year = parseFloat(presentInput.value);
+  const layer = toolVar.area._parentLayer;
+  const preexist = layer.getStructure(year);
+  const structure = layer.createStructureByYear(year).clone();
+
+  structure.figure.floodFillAt(x, y, toolVar.area.id);
+  const diff = preexist.figure.difference(structure.figure);
+
+  toolVar.structure.figure = diff;
+
+  processFrame();
+}
+
+function drawBrush(cx, cy) {
+  if (cx > canvas.width || cx < 0) return;
+  
+  const x = window.camera.convertScreenToMapX(canvas, cx);
+  const y = window.camera.convertScreenToMapY(canvas, cy);
+  const mx = (x % 1 + 1) % 1;
+  const radius = toolVar.radius;
+  const area = toolVar.area;
+
+  toolVar.cx = cx;
+  toolVar.cy = cy;
+
+  toolVar.areas = area._parentLayer.areas;
+
+  const depth = Math.round(Math.log2(window.camera.xZoom));
+  toolVar.structure.figure.drawCircle(mx - 1, y, radius, area.id, 0.5, depth);
+  toolVar.structure.figure.drawCircle(mx + 0, y, radius, area.id, 0.5, depth);
+  toolVar.structure.figure.drawCircle(mx + 1, y, radius, area.id, 0.5, depth);
+  processFrame();
+}
 
 function addStructureApplyButton() {
   const applyButton = document.createElement("button");
@@ -343,7 +315,7 @@ function setTool(toolId) {
   if (!tool)
     throw new Error("Tool not found");
 
-  if (tool.init) tool.init();
+   if (tool.init) tool.init();
 
   Object.keys(tool.adds).forEach(k => {
     const v = tool.adds[k];
