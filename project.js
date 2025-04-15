@@ -527,7 +527,7 @@ export class Project {
         return undefined;
       }
       return value;
-    }, 1);
+    }, "\t").replace(/\t/g, "");
   }
 
   /**
