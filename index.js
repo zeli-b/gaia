@@ -264,7 +264,6 @@ function addStructureApplyButton() {
   toolPropertiesDiv.appendChild(applyButton);
 }
 
-
 function addCollisionStrategySelect() {
   const collisionStrategy = document.createElement("select");
   collisionStrategy.style.display = "block";
@@ -411,6 +410,25 @@ const topbar = [
     label: "Undo",
     onclick: () => {
       popUndoStack();
+    }
+  },
+  {
+    id: "export",
+    label: "Export",
+    onclick: () => {
+      const result = document.createElement("canvas");
+      const rctx = result.getContext("2d");
+      result.width = 4096;
+      result.height = 2048;
+      const rcam = new Camera(0.5, 0.5, result.width, result.height);
+      const year = presentInput.value;
+
+      window.project.render(year, result, rctx, rcam, true);
+
+      const link = document.createElement('a');
+      link.download = window.project.name +'.png';
+      link.href = result.toDataURL();
+      link.click();
     }
   },
 ];
