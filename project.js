@@ -287,6 +287,7 @@ export class Layer {
     const possible = this.getStructure(year);
 
     if (possible.startYear == year) {
+      possible._rendered = false;
       return possible;
     }
 
