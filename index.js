@@ -236,17 +236,24 @@ function addStructureApplyButton() {
   applyButton.style.display = "block";
   applyButton.innerText = "Apply";
   applyButton.onclick = () => {
-    const year = parseFloat(presentInput.value);
+    const year = Number(presentInput.value);
     const change = toolVar.structure;
     const layer = toolVar.area._parentLayer;
     const strategy = toolVar.collisionStrategy;
 
-    const thisYear = layer.createStructureByYear(year);
     const isNull = c => c === null;
     const isNotNull = c => c !== null;
-    let p = thisYear.clone();
+
+    const childdiff = change.figure.mapValue(v => v === null ? null : 0);
+    layer.forRecursiveChildren(l => {
+      l.createStructureByYear(year).figure.overlap(childdiff, isNull);
+      l.forEachStructureAfter(year, z => z.figure.overlap(childdiff, isNull));
+    });
+
+    const thisYear = layer.createStructureByYear(year);
+    let p = thisYear;
     thisYear.figure.overlap(change.figure, isNull);
-    layer.forEachStructureAfter(year, (s) => {
+    layer.forEachStructureAfter(year, s => {
       if (strategy === COLLISION_OVERLAP) {
         s.figure.overlap(change.figure, isNull);
       } else if (strategy === COLLISION_EXCLUDE) {
@@ -258,6 +265,7 @@ function addStructureApplyButton() {
         p = s;
       }
     });
+
     change.figure = new Quadtree(null);
     processFrame(true);
   };

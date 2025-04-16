@@ -291,6 +291,7 @@ export class Layer {
     }
 
     const newStructure = possible.clone(year);
+    newStructure.startYear = year;
     this.addStructure(newStructure);
     return newStructure;
   }
@@ -504,6 +505,10 @@ export class Layer {
    */
   addChildLayer(layer) {
     this.childLayers.push(layer);
+  }
+
+  forRecursiveChildren(callback) {
+    this.childLayers.forEach(l => callback(l));
   }
 }
 

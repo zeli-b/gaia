@@ -848,7 +848,22 @@ export class Quadtree {
    * 복제품을 만든다
    */
   clone() {
-    return parseQuadtree(this.toJSON());
+    return this.mapValue(i => i);
+  }
+
+  mapValue(callback) {
+    const result = new Quadtree(null);
+    if (!this.isDivided()) {
+      result.value = callback(this.value);
+      return result;
+    }
+
+    result.divide();
+    for (let i = 0; i < 4; i++) {
+      result.setChild(i, this.children[i].mapValue(callback));
+    }
+
+    return result.reduce();
   }
 }
 
