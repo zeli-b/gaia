@@ -246,8 +246,13 @@ function addStructureApplyButton() {
 
     const childdiff = change.figure.mapValue(v => v === null ? null : 0);
     layer.forRecursiveChildren(l => {
-      l.createStructureByYear(year).figure.overlap(childdiff, isNull);
-      l.forEachStructureAfter(year, z => z.figure.overlap(childdiff, isNull));
+      const s = l.createStructureByYear(year);
+      s.figure.overlap(childdiff, isNull);
+      s._rendered = false;
+      l.forEachStructureAfter(year, z => {
+        z._rendered = false;
+        z.figure.overlap(childdiff, isNull)
+      });
     });
 
     const thisYear = layer.createStructureByYear(year);
