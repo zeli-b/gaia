@@ -118,6 +118,7 @@ export class Structure {
     this._canvas = document.createElement("canvas");
     this._ctx = this._canvas.getContext("2d");
     this._rendered = false;
+    this._removed = false;
   }
 
   /**
@@ -127,6 +128,15 @@ export class Structure {
     const container = document.createElement("div");
     container.classList.add("structure-structure");
     container.innerText = `Structure from ${this.startYear}`;
+
+    const removeButton = document.createElement("button");
+    removeButton.style.display = "block";
+    removeButton.innerText = "Delete";
+    removeButton.onclick = () => {
+      this._removed = true;
+      document.dispatchEvent(new CustomEvent("processframe", {detail: {force: true}}));
+    };
+    container.appendChild(removeButton);
 
     return container;
   }
@@ -401,6 +411,7 @@ export class Layer {
       if (this.structureVisible) {
         const structureDiv = document.createElement("div");
         structureDiv.classList.add("structure-structure-div");
+        this.structures = this.structures.filter(s => !s._removed);
         this.structures.forEach(s => {
           structureDiv.appendChild(s.renderDiv());
         });
