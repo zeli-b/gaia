@@ -103,6 +103,7 @@ const tools = {
         const cx = (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (touch.clientY - canvas.offsetTop) * window.devicePixelRatio;
 
+        toolVar.e = e;
         drawBrush(cx, cy);
       },
       mousedown: e => {
@@ -117,10 +118,19 @@ const tools = {
 
         if (!toolVar.brushing) return;
 
+        toolVar.e = e;
         drawBrush(cx, cy);
       },
       mouseup: e => {
         toolVar.brushing = false;
+      },
+      keydown: e => {
+        if (e.key === "Space")
+          toolVar.space = true;
+      },
+      keyup: e => {
+        if (e.key === "Space")
+          toolVar.space = false;
       }
     },
     init: () => {
@@ -212,6 +222,16 @@ function drawPaint(cx, cy) {
 
 function drawBrush(cx, cy) {
   if (cx > canvas.width || cx < 0) return;
+
+  if (toolBar.space) {
+    const dx = e.deltaX / window.camera.xZoom;
+    const dy = e.deltaY / window.camera.yZoom;
+
+    window.camera.setX(window.camera.x + dx);
+    window.camera.setY(window.camera.y + dy);
+    
+    return;
+  }
   
   const x = window.camera.convertScreenToMapX(canvas, cx);
   const y = window.camera.convertScreenToMapY(canvas, cy);
