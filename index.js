@@ -223,7 +223,7 @@ function drawPaint(cx, cy) {
 function drawBrush(cx, cy) {
   if (cx > canvas.width || cx < 0) return;
 
-  if (toolBar.space) {
+  if (toolVar.space) {
     const dx = e.deltaX / window.camera.xZoom;
     const dy = e.deltaY / window.camera.yZoom;
 
