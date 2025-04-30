@@ -771,8 +771,11 @@ window.addEventListener("touchend", e => {
 
 // 스크롤 확대 축 기능
 window.addEventListener("wheel", e => {
-  window.camera.setXZoom(window.camera.xZoom * Math.exp(e.deltaY * 0.002));
-  window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * 0.002));
+  const cx = e.clientX;
+  if (cx > canvas.width || cx < 0) return;
+
+  window.camera.setXZoom(window.camera.xZoom * Math.exp(e.deltaY * -0.002));
+  window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * -0.002));
 
   processFrame();
 })
@@ -781,6 +784,9 @@ window.addEventListener("wheel", e => {
 window.addEventListener("wheel", e => {
   if (e.ctrlKey) {
     e.preventDefault();
+
+    const cx = e.clientX;
+    if (cx > canvas.width || cx < 0) return;
 
     window.camera.setXZoom(window.camera.xZoom * Math.exp(e.deltaY * -0.002));
     window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * -0.002));
