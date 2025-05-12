@@ -716,7 +716,8 @@ function drawParallels() {
  * 이벤트 처리 시에는 이 함수를 콜해서 화면을 업데이트해주어야 한다.
  * @param {boolean} [force] - 강제로 화면을 렌더할지 결정
  */
-export function processFrame(force = false) {
+export function processFrame(force) {
+  force = force !== undefined ? false : force;
   ctx.globalAlpha = 1.0;
 
   renderProjectStructureDiv();
