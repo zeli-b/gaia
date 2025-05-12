@@ -19,12 +19,12 @@ const tools = {
     id: "span",
     label: "Span",
     adds: {
-      touchstart: e => {
+      touchstart: (e) => {
         const touch = e.touches[0];
         toolVar.px = touch.screenX;
         toolVar.py = touch.screenY;
       },
-      touchmove: e => {
+      touchmove: (e) => {
         const touch = e.touches[0];
 
         if (toolVar.px && toolVar.py && !scaling) {
@@ -39,17 +39,17 @@ const tools = {
         toolVar.px = touch.screenX;
         toolVar.py = touch.screenY;
       },
-      mousedown: e => {
+      mousedown: (e) => {
         toolVar.px = e.screenX;
         toolVar.py = e.screenY;
         toolVar.isSpanning = true;
       },
-      mouseup: e => {
+      mouseup: (e) => {
         toolVar.px = undefined;
         toolVar.py = undefined;
         toolVar.isSpanning = false;
       },
-      mousemove: e => {
+      mousemove: (e) => {
         if (toolVar.isSpanning) {
           const dx = (e.screenX - toolVar.px) * window.devicePixelRatio;
           const dy = (e.screenY - toolVar.py) * window.devicePixelRatio;
@@ -61,24 +61,24 @@ const tools = {
 
         toolVar.px = e.screenX;
         toolVar.py = e.screenY;
-      }
-    }
+      },
+    },
   },
   zoom: {
     id: "zoom",
     label: "Zoom",
     adds: {
-      mousedown: e => {
+      mousedown: (e) => {
         toolVar.px = e.screenX;
         toolVar.py = e.screenY;
         toolVar.isSpanning = true;
       },
-      mouseup: e => {
+      mouseup: (e) => {
         toolVar.px = undefined;
         toolVar.py = undefined;
         toolVar.isSpanning = false;
       },
-      mousemove: e => {
+      mousemove: (e) => {
         if (toolVar.isSpanning) {
           const dx = (e.screenX - toolVar.px) * window.devicePixelRatio;
           const dy = (e.screenY - toolVar.py) * window.devicePixelRatio;
@@ -91,26 +91,27 @@ const tools = {
 
         toolVar.px = e.screenX;
         toolVar.py = e.screenY;
-      }
-    }
+      },
+    },
   },
   brush: {
     id: "brush",
     label: "Brush",
     adds: {
-      touchmove: e => {
+      touchmove: (e) => {
         const touch = e.touches[0];
-        const cx = (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
+        const cx =
+          (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (touch.clientY - canvas.offsetTop) * window.devicePixelRatio;
 
         toolVar.e = e;
         drawBrush(cx, cy);
       },
-      mousedown: e => {
+      mousedown: (e) => {
         toolVar.brushing = true;
         pushUndoStack();
       },
-      mousemove: e => {
+      mousemove: (e) => {
         const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
         toolVar.cx = cx;
@@ -121,17 +122,15 @@ const tools = {
         toolVar.e = e;
         drawBrush(cx, cy);
       },
-      mouseup: e => {
+      mouseup: (e) => {
         toolVar.brushing = false;
       },
-      keydown: e => {
-        if (e.key === "Space")
-          toolVar.space = true;
+      keydown: (e) => {
+        if (e.key === "Space") toolVar.space = true;
       },
-      keyup: e => {
-        if (e.key === "Space")
-          toolVar.space = false;
-      }
+      keyup: (e) => {
+        if (e.key === "Space") toolVar.space = false;
+      },
     },
     init: () => {
       toolVar.structure = new Structure(0, new Quadtree(null));
@@ -144,7 +143,7 @@ const tools = {
       sizeRange.step = 1;
       sizeRange.value = 16;
       toolVar.radius = sizeRange.value / window.camera.yZoom;
-      sizeRange.onchange = e => {
+      sizeRange.onchange = (e) => {
         toolVar.radius = sizeRange.value / window.camera.yZoom;
         toolVar.cx = canvas.width / 2;
         toolVar.cy = canvas.height / 2;
@@ -155,7 +154,7 @@ const tools = {
       addCollisionStrategySelect();
       addStructureApplyButton();
     },
-    render: force => {
+    render: (force) => {
       const radius = toolVar.radius * window.camera.yZoom;
       ctx.beginPath();
       ctx.arc(toolVar.cx, toolVar.cy, radius, 0, 2 * Math.PI);
@@ -163,39 +162,40 @@ const tools = {
 
       ctx.globalAlpha = 0.4;
       toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, true);
-    }
+    },
   },
   paint: {
     id: "paint",
     label: "Paint",
     adds: {
-      touchstart: e => {
+      touchstart: (e) => {
         if (!toolVar.area) return;
 
         const touch = e.touches[0];
-        const cx = (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
+        const cx =
+          (touch.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (touch.clientY - canvas.offsetTop) * window.devicePixelRatio;
 
         drawPaint(cx, cy);
       },
-      mousedown: e => {
+      mousedown: (e) => {
         if (!toolVar.area) return;
 
         const cx = (e.clientX - canvas.offsetLeft) * window.devicePixelRatio;
         const cy = (e.clientY - canvas.offsetTop) * window.devicePixelRatio;
 
         drawPaint(cx, cy);
-      }
+      },
     },
     init: () => {
       const cs = addCollisionStrategySelect();
       addStructureApplyButton(cs);
     },
-    render: force => {
+    render: (force) => {
       ctx.globalAlpha = 0.4;
       toolVar.structure.render(toolVar.areas, canvas, ctx, window.camera, true);
-    }
-  }
+    },
+  },
 };
 window.tools = tools;
 
@@ -229,13 +229,13 @@ function drawBrush(cx, cy) {
 
     window.camera.setX(window.camera.x + dx);
     window.camera.setY(window.camera.y + dy);
-    
+
     return;
   }
-  
+
   const x = window.camera.convertScreenToMapX(canvas, cx);
   const y = window.camera.convertScreenToMapY(canvas, cy);
-  const mx = (x % 1 + 1) % 1;
+  const mx = ((x % 1) + 1) % 1;
   const radius = toolVar.radius;
   const area = toolVar.area;
 
@@ -261,24 +261,24 @@ function addStructureApplyButton() {
     const layer = toolVar.area._parentLayer;
     const strategy = toolVar.collisionStrategy;
 
-    const isNull = c => c === null;
-    const isNotNull = c => c !== null;
+    const isNull = (c) => c === null;
+    const isNotNull = (c) => c !== null;
 
-    const childdiff = change.figure.mapValue(v => v === null ? null : 0);
-    layer.forRecursiveChildren(l => {
+    const childdiff = change.figure.mapValue((v) => (v === null ? null : 0));
+    layer.forRecursiveChildren((l) => {
       const s = l.createStructureByYear(year);
       s.figure.overlap(childdiff, isNull);
       s._rendered = false;
-      l.forEachStructureAfter(year, z => {
+      l.forEachStructureAfter(year, (z) => {
         z._rendered = false;
-        z.figure.overlap(childdiff, isNull)
+        z.figure.overlap(childdiff, isNull);
       });
     });
 
     const thisYear = layer.createStructureByYear(year);
     let p = thisYear;
     thisYear.figure.overlap(change.figure, isNull);
-    layer.forEachStructureAfter(year, s => {
+    layer.forEachStructureAfter(year, (s) => {
       if (strategy === COLLISION_OVERLAP) {
         s.figure.overlap(change.figure, isNull);
       } else if (strategy === COLLISION_EXCLUDE) {
@@ -333,7 +333,7 @@ function setTool(toolId) {
   if (nowTool) {
     // remove previous tools
     const prvTool = tools[nowTool];
-    Object.keys(prvTool.adds).forEach(k => {
+    Object.keys(prvTool.adds).forEach((k) => {
       const v = prvTool.adds[k];
       window.removeEventListener(k, v);
     });
@@ -344,12 +344,11 @@ function setTool(toolId) {
   // apply mew tools
   const tool = tools[toolId];
 
-  if (!tool)
-    throw new Error("Tool not found");
+  if (!tool) throw new Error("Tool not found");
 
-   if (tool.init) tool.init();
+  if (tool.init) tool.init();
 
-  Object.keys(tool.adds).forEach(k => {
+  Object.keys(tool.adds).forEach((k) => {
     const v = tool.adds[k];
     window.addEventListener(k, v);
   });
@@ -377,21 +376,21 @@ const topbar = [
     id: "open-project",
     label: "Open",
     onclick: () => {
-      let input = document.createElement('input');
-      input.type = 'file';
+      let input = document.createElement("input");
+      input.type = "file";
       input.onchange = () => {
         // you can use this method to get file and perform respective operations
         const file = input.files[0];
         const read = new FileReader();
-        read.readAsText(file, 'UTf-8');
+        read.readAsText(file, "UTf-8");
         read.onloadend = () => {
           const project = parseProject(read.result);
           loadProject(project);
           processFrame(true);
-        }
+        };
       };
       input.click();
-    }
+    },
   },
   {
     id: "save-project",
@@ -400,17 +399,17 @@ const topbar = [
       const text = window.project.stringify();
       const filename = window.project.name + ".json";
 
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.setAttribute(
-        'href',
-        'data:text/plain;charset=utf-8,' + encodeURIComponent(text)
+        "href",
+        "data:text/plain;charset=utf-8," + encodeURIComponent(text),
       );
-      a.setAttribute('download', filename);
-      a.style.display = 'none';
+      a.setAttribute("download", filename);
+      a.style.display = "none";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    }
+    },
   },
   {
     id: "fullscreen",
@@ -429,21 +428,21 @@ const topbar = [
       bottombarDiv.style.display = "none";
       exitFullscreenDiv.style.display = "block";
       processFrame();
-    }
+    },
   },
   {
     id: "process-frame",
     label: "Process Frame",
     onclick: () => {
       processFrame(true);
-    }
+    },
   },
   {
     id: "undo",
     label: "Undo",
     onclick: () => {
       popUndoStack();
-    }
+    },
   },
   {
     id: "export",
@@ -458,11 +457,11 @@ const topbar = [
 
       window.project.render(year, result, rctx, rcam, true);
 
-      const link = document.createElement('a');
-      link.download = window.project.name +'.png';
+      const link = document.createElement("a");
+      link.download = window.project.name + ".png";
       link.href = result.toDataURL();
       link.click();
-    }
+    },
   },
 ];
 
@@ -479,7 +478,7 @@ let toolPropertiesDiv;
 document.addEventListener("DOMContentLoaded", () => {
   // canvas 불러오기 및 이벤트 추가
   canvas = document.querySelector("#canvas");
-  ctx = canvas.getContext('2d');
+  ctx = canvas.getContext("2d");
 
   canvas.width = canvas.clientWidth * window.devicePixelRatio;
   canvas.height = canvas.clientHeight * window.devicePixelRatio;
@@ -488,11 +487,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // present
   presentInput = document.querySelector("#present");
   presentInputRange = document.querySelector("#present-range");
-  presentInput.onchange = e => {
+  presentInput.onchange = (e) => {
     presentInputRange.value = e.target.value;
     processFrame(true);
   };
-  presentInputRange.onchange = e => {
+  presentInputRange.onchange = (e) => {
     presentInput.value = e.target.value;
     processFrame(true);
   };
@@ -512,7 +511,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // toolbar items
   const toolbarDiv = document.querySelector("#toolbar");
-  Object.values(tools).forEach(t => {
+  Object.values(tools).forEach((t) => {
     const div = document.createElement("div");
     const radio = document.createElement("input");
     radio.type = "radio";
@@ -530,17 +529,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // exit fullscreen process
   const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
   exitFullscreenDiv.onclick = () => {
-      // 파츠 불러오기
-      const propertiesDiv = document.querySelector("#properties");
-      const bottombarDiv = document.querySelector("#bottombar");
-      const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
+    // 파츠 불러오기
+    const propertiesDiv = document.querySelector("#properties");
+    const bottombarDiv = document.querySelector("#bottombar");
+    const exitFullscreenDiv = document.querySelector("#exit-fullscreen");
 
-      propertiesDiv.style.display = "block";
-      toolbarDiv.style.display = "block";
-      topbarDiv.style.display = "block";
-      bottombarDiv.style.display = "block";
-      exitFullscreenDiv.style.display = "none";
-      processFrame();
+    propertiesDiv.style.display = "block";
+    toolbarDiv.style.display = "block";
+    topbarDiv.style.display = "block";
+    bottombarDiv.style.display = "block";
+    exitFullscreenDiv.style.display = "none";
+    processFrame();
   };
 
   // projectStructureDiv
@@ -574,8 +573,7 @@ function loadProject(project) {
  * 계산 등 화면 렌더링에 필요한 부수적인 것들을
  * 계산하는 함수. 프레임마다 혹은 이벤트 발생 시마다 실행됨
  */
-function tick() {
-}
+function tick() {}
 
 /**
  * 화면에 보이는 것들을 렌더링하는 함수
@@ -592,8 +590,10 @@ function render(force = false) {
     for (let y = 0; y < canvas.height; y += transparentSize * 2) {
       ctx.fillRect(x, y, transparentSize, transparentSize);
       ctx.fillRect(
-        x + transparentSize, y + transparentSize,
-        transparentSize, transparentSize
+        x + transparentSize,
+        y + transparentSize,
+        transparentSize,
+        transparentSize,
       );
     }
 
@@ -602,7 +602,7 @@ function render(force = false) {
     force = true;
     window.camera.update = false;
   }
-  
+
   // render project
   const year = presentInput.value;
   window.project.render(year, canvas, ctx, window.camera, force);
@@ -623,15 +623,15 @@ function drawParallels() {
 
   // 촘촘한 위도선
   const deltaY = Math.pow(
-    10, Math.round(Math.log10(canvas.height / window.camera.yZoom) + 1.7));
+    10,
+    Math.round(Math.log10(canvas.height / window.camera.yZoom) + 1.7),
+  );
   if (deltaY < 100) {
     ctx.strokeStyle = "black";
     for (let y = 0; y <= 180; y += deltaY) {
       const screenY = window.camera.convertMapToScreenY(canvas, y / 180);
-      if (screenY < 0)
-        continue;
-      if (screenY > canvas.height)
-        break;
+      if (screenY < 0) continue;
+      if (screenY > canvas.height) break;
       ctx.beginPath();
       ctx.moveTo(0, screenY);
       ctx.lineTo(canvas.width, screenY);
@@ -640,10 +640,8 @@ function drawParallels() {
 
     for (let y = 0; ; y += deltaY) {
       const screenY = window.camera.convertMapToScreenX(canvas, y / 360);
-      if (screenY < 0)
-        continue;
-      if (screenY > canvas.width)
-        break;
+      if (screenY < 0) continue;
+      if (screenY > canvas.width) break;
 
       ctx.beginPath();
       ctx.moveTo(screenY, 0);
@@ -660,7 +658,7 @@ function drawParallels() {
     ctx.moveTo(0, window.camera.convertMapToScreenY(canvas, 0.5));
     ctx.lineTo(canvas.width, window.camera.convertMapToScreenY(canvas, 0.5));
     ctx.stroke();
-    
+
     // 북위 30도선
     ctx.strokeStyle = "black";
     ctx.lineWidth = 1;
@@ -696,14 +694,14 @@ function drawParallels() {
 
   // 경도선
   const start = Math.floor(window.camera.convertScreenToMapX(canvas, 0)) * 12;
-  const end = Math.ceil(window.camera.convertScreenToMapX(canvas, canvas.width)) * 12;
+  const end =
+    Math.ceil(window.camera.convertScreenToMapX(canvas, canvas.width)) * 12;
   const yStart = window.camera.convertMapToScreenY(canvas, 0);
   const yEnd = window.camera.convertMapToScreenY(canvas, 1);
   for (let x = start; x < end; x++) {
     if (x % 12 === 6) {
       ctx.strokeStyle = "red";
-    } else
-      ctx.strokeStyle = "black";
+    } else ctx.strokeStyle = "black";
     const sx = window.camera.convertMapToScreenX(canvas, x / 12);
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -729,7 +727,7 @@ export function processFrame(force = false) {
   presentInputRange.max = window.project.getLastYear() + 1;
 }
 window.processFrame = processFrame;
-document.addEventListener("processframe", e => processFrame(e.detail?.force));
+document.addEventListener("processframe", (e) => processFrame(e.detail?.force));
 
 // 휴대폰 핀치 스크롤 대응
 let scaling = 0;
@@ -741,7 +739,7 @@ let pinchCenter = null;
 function getPinchDistance(e) {
   return Math.hypot(
     e.touches[0].pageX - e.touches[1].pageX,
-    e.touches[0].pageY - e.touches[1].pageY
+    e.touches[0].pageY - e.touches[1].pageY,
   );
 }
 
@@ -754,35 +752,41 @@ function getPinchPosition(e) {
   return [x, y];
 }
 
-window.addEventListener("touchstart", e => {
+window.addEventListener("touchstart", (e) => {
   if (e.touches.length === 2) {
     scaling = getPinchDistance(e) * window.devicePixelRatio;
     pinchCenter = getPinchPosition(e);
   }
 });
 
-window.addEventListener("touchmove", e => {
-  if (event.scale !== 1) { event.preventDefault(); }
+window.addEventListener(
+  "touchmove",
+  (e) => {
+    if (event.scale !== 1) {
+      event.preventDefault();
+    }
 
-  if (scaling > 0) {
-    const newScale = getPinchDistance(e) * window.devicePixelRatio;
-    // window.camera.zoom *= newScale / scaling;
-    window.camera.setXZoom(window.camera.xZoom * (newScale / scaling));
-    window.camera.setYZoom(window.camera.yZoom * (newScale / scaling));
-    scaling = newScale;
+    if (scaling > 0) {
+      const newScale = getPinchDistance(e) * window.devicePixelRatio;
+      // window.camera.zoom *= newScale / scaling;
+      window.camera.setXZoom(window.camera.xZoom * (newScale / scaling));
+      window.camera.setYZoom(window.camera.yZoom * (newScale / scaling));
+      scaling = newScale;
 
-    const newPosition = getPinchPosition(e);
-    const dx = (newPosition[0] - pinchCenter[0]) * window.devicePixelRatio;
-    const dy = (newPosition[1] - pinchCenter[1]) * window.devicePixelRatio;
-    window.camera.setX(window.camera.x - dx / window.camera.xZoom);
-    window.camera.setY(window.camera.y - dy / window.camera.yZoom);
-    pinchCenter = newPosition;
-    
-    processFrame();
-  }
-}, { passive: false });
+      const newPosition = getPinchPosition(e);
+      const dx = (newPosition[0] - pinchCenter[0]) * window.devicePixelRatio;
+      const dy = (newPosition[1] - pinchCenter[1]) * window.devicePixelRatio;
+      window.camera.setX(window.camera.x - dx / window.camera.xZoom);
+      window.camera.setY(window.camera.y - dy / window.camera.yZoom);
+      pinchCenter = newPosition;
 
-window.addEventListener("touchend", e => {
+      processFrame();
+    }
+  },
+  { passive: false },
+);
+
+window.addEventListener("touchend", (e) => {
   if (scaling) {
     scaling = 0;
     pinchCenter = null;
@@ -790,7 +794,7 @@ window.addEventListener("touchend", e => {
 });
 
 // 스크롤 확대 축 기능
-window.addEventListener("wheel", e => {
+window.addEventListener("wheel", (e) => {
   const cx = e.clientX;
   if (cx > canvas.width || cx < 0) return;
 
@@ -798,28 +802,32 @@ window.addEventListener("wheel", e => {
   window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * -0.002));
 
   processFrame();
-})
+});
 
 // 트랙패드 줌 기능
-window.addEventListener("wheel", e => {
-  if (e.ctrlKey) {
-    e.preventDefault();
+window.addEventListener(
+  "wheel",
+  (e) => {
+    if (e.ctrlKey) {
+      e.preventDefault();
 
-    const cx = e.clientX;
-    if (cx > canvas.width || cx < 0) return;
+      const cx = e.clientX;
+      if (cx > canvas.width || cx < 0) return;
 
-    window.camera.setXZoom(window.camera.xZoom * Math.exp(e.deltaY * -0.002));
-    window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * -0.002));
+      window.camera.setXZoom(window.camera.xZoom * Math.exp(e.deltaY * -0.002));
+      window.camera.setYZoom(window.camera.yZoom * Math.exp(e.deltaY * -0.002));
 
-    processFrame();
-  }
-}, { passive: false });
+      processFrame();
+    }
+  },
+  { passive: false },
+);
 
 // 영역 선택 처리
-document.addEventListener("selectarea", e => {
+document.addEventListener("selectarea", (e) => {
   if (
-    toolVar.area
-    && toolVar.area._parentLayer !== e.detail.area._parentLayer
+    toolVar.area &&
+    toolVar.area._parentLayer !== e.detail.area._parentLayer
   ) {
     toolVar.structure.figure = new Quadtree(null);
   }
@@ -837,13 +845,13 @@ function pushUndoStack() {
     undoStack.splice(0, 1);
   }
 
-  undoStack.push([project.clone(), {...toolVar}]);
+  undoStack.push([project.clone(), { ...toolVar }]);
 }
 document.addEventListener("pushundo", pushUndoStack);
 
 function popUndoStack() {
   if (undoStack.length <= 0) return;
-  
+
   [window.project, toolVar] = undoStack.pop();
   window.toolVar = toolVar;
   processFrame(true);

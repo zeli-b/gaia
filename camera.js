@@ -24,7 +24,7 @@ export class Camera {
     const sx = this.convertScreenToMapX(canvas, 0);
     const sy = this.convertScreenToMapY(canvas, 0);
     const ex = this.convertScreenToMapX(canvas, canvas.width);
-    const ey = this.convertScreenToMapY(canvas, canvas.height)
+    const ey = this.convertScreenToMapY(canvas, canvas.height);
     const original = JSON.stringify(this.onlyChild);
 
     this.dx = 0;
@@ -35,16 +35,20 @@ export class Camera {
       const half = size / 2;
 
       if (
-        this.dx <= sx && ex < this.dx + half
-        && this.dy <= sy && ey < this.dy + half
+        this.dx <= sx &&
+        ex < this.dx + half &&
+        this.dy <= sy &&
+        ey < this.dy + half
       ) {
         this.onlyChild.push(0);
         continue;
       }
 
       if (
-        this.dx + half <= sx && ex < this.dx + size
-        && this.dy <= sy && ey < this.dy + half
+        this.dx + half <= sx &&
+        ex < this.dx + size &&
+        this.dy <= sy &&
+        ey < this.dy + half
       ) {
         this.onlyChild.push(1);
         this.dx += half;
@@ -52,8 +56,10 @@ export class Camera {
       }
 
       if (
-        this.dx <= sx && ex < this.dx + half
-        && this.dy + half <= sy && ey < this.dy + size
+        this.dx <= sx &&
+        ex < this.dx + half &&
+        this.dy + half <= sy &&
+        ey < this.dy + size
       ) {
         this.onlyChild.push(2);
         this.dy += half;
@@ -61,8 +67,10 @@ export class Camera {
       }
 
       if (
-        this.dx + half <= sx && ex < this.dx + size
-        && this.dy + half <= sy && ey < this.dy + size
+        this.dx + half <= sx &&
+        ex < this.dx + size &&
+        this.dy + half <= sy &&
+        ey < this.dy + size
       ) {
         this.onlyChild.push(3);
         this.dx += half;
@@ -126,7 +134,7 @@ export class Camera {
    * 카메라의 x좌표를 설정
    */
   setX(x) {
-    this.x = (x % 1 + 1) % 1;
+    this.x = ((x % 1) + 1) % 1;
     return this;
   }
 
@@ -147,8 +155,9 @@ export class Camera {
     const original = this.xZoom;
     this.xZoom = Math.max(Math.min(zoom, 2000000), 2);
 
-    this.update = this.update
-      || Math.floor(Math.log2(this.xZoom)) !== Math.floor(Math.log2(original));
+    this.update =
+      this.update ||
+      Math.floor(Math.log2(this.xZoom)) !== Math.floor(Math.log2(original));
     return this;
   }
 
@@ -161,7 +170,8 @@ export class Camera {
     const original = this.yZoom;
     this.yZoom = Math.max(Math.min(zoom, 1000000), 1);
 
-    this.update = this.update ||
+    this.update =
+      this.update ||
       Math.floor(Math.log2(this.yZoom)) !== Math.floor(Math.log2(original));
     return this;
   }

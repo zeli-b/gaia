@@ -36,7 +36,7 @@ export class Area {
     radio.onclick = () => {
       document.dispatchEvent(new Event("pushundo"));
       document.dispatchEvent(
-        new CustomEvent("selectarea", {detail: {area: this}})
+        new CustomEvent("selectarea", { detail: { area: this } }),
       );
     };
     container.appendChild(radio);
@@ -50,7 +50,7 @@ export class Area {
       document.dispatchEvent(new Event("pushundo"));
       this.color = color;
       document.dispatchEvent(
-        new CustomEvent("processframe", {detail: {force: true}})
+        new CustomEvent("processframe", { detail: { force: true } }),
       );
     };
     container.appendChild(recolorButton);
@@ -71,12 +71,11 @@ export class Area {
     deleteButton.style.display = "block";
     deleteButton.innerText = "Remove Area";
     deleteButton.onclick = () => {
-      if (prompt(this.name) !== this.name)
-        return;
+      if (prompt(this.name) !== this.name) return;
       document.dispatchEvent(new Event("pushundo"));
       this._removed = true;
       document.dispatchEvent(
-        new CustomEvent("processframe", {detail: {force: true}})
+        new CustomEvent("processframe", { detail: { force: true } }),
       );
     };
     container.appendChild(deleteButton);
@@ -134,7 +133,9 @@ export class Structure {
     removeButton.innerText = "Delete";
     removeButton.onclick = () => {
       this._removed = true;
-      document.dispatchEvent(new CustomEvent("processframe", {detail: {force: true}}));
+      document.dispatchEvent(
+        new CustomEvent("processframe", { detail: { force: true } }),
+      );
     };
     container.appendChild(removeButton);
 
@@ -152,8 +153,9 @@ export class Structure {
    */
   render(areas, canvas, context, camera, force = false) {
     if (this._rendered && !force) {
-      const left = camera.convertMapToScreenX(canvas, camera.dx) % camera.xZoom
-        - camera.xZoom;
+      const left =
+        (camera.convertMapToScreenX(canvas, camera.dx) % camera.xZoom) -
+        camera.xZoom;
       const up = camera.convertMapToScreenY(canvas, camera.dy);
       context.imageSmoothingEnabled = false;
       const width = camera.xZoom / Math.pow(2, camera.onlyChild.length);
@@ -200,7 +202,7 @@ export class Layer {
     this.name = name;
     this.structures = [new Structure(0, new Quadtree(0))];
     this.areas = {
-      0: new Area("No Name", "transparent").setId(0).setParentLayer(this)
+      0: new Area("No Name", "transparent").setId(0).setParentLayer(this),
     };
     this.unaffected = unaffected;
     this.childLayers = [];
@@ -232,7 +234,7 @@ export class Layer {
       structure.render(this.areas, canvas, context, camera, force);
     }
 
-    this.childLayers.forEach(l => l.render(year, canvas, context, camera));
+    this.childLayers.forEach((l) => l.render(year, canvas, context, camera));
 
     return this;
   }
@@ -248,10 +250,9 @@ export class Layer {
     let result = 0;
 
     const structure = this.getLastStructure();
-    if (structure)
-      result = Math.max(result, structure.startYear);
+    if (structure) result = Math.max(result, structure.startYear);
 
-    this.childLayers.forEach(l => result = Math.max(l.getLastYear()));
+    this.childLayers.forEach((l) => (result = Math.max(l.getLastYear())));
 
     return result;
   }
@@ -332,11 +333,11 @@ export class Layer {
     const disableToggle = document.createElement("input");
     disableToggle.type = "checkbox";
     disableToggle.checked = !this.disabled;
-    disableToggle.onchange = e => {
+    disableToggle.onchange = (e) => {
       document.dispatchEvent(new Event("pushundo"));
       this.disabled = !e.target.checked;
       document.dispatchEvent(
-        new CustomEvent("processframe", {detail: {force: true}})
+        new CustomEvent("processframe", { detail: { force: true } }),
       );
     };
     layerTitle.appendChild(disableToggle);
@@ -344,7 +345,7 @@ export class Layer {
     const structureToggle = document.createElement("input");
     structureToggle.type = "checkbox";
     structureToggle.checked = this.structureVisible;
-    structureToggle.onchange = e => {
+    structureToggle.onchange = (e) => {
       document.dispatchEvent(new Event("pushundo"));
       this.structureVisible = e.target.checked;
       document.dispatchEvent(new CustomEvent("processframe"));
@@ -354,7 +355,7 @@ export class Layer {
     const areaToggle = document.createElement("input");
     areaToggle.type = "checkbox";
     areaToggle.checked = this.areaVisible;
-    areaToggle.onchange = e => {
+    areaToggle.onchange = (e) => {
       document.dispatchEvent(new Event("pushundo"));
       this.areaVisible = e.target.checked;
       document.dispatchEvent(new CustomEvent("processframe"));
@@ -375,9 +376,9 @@ export class Layer {
     opacityRange.onchange = () => {
       this.opacity = Number(opacityRange.value);
       document.dispatchEvent(
-        new CustomEvent("processframe", {detail: {force: true}})
+        new CustomEvent("processframe", { detail: { force: true } }),
       );
-    }
+    };
     layerTitle.appendChild(opacityRange);
 
     const deleteLayerButton = document.createElement("button");
@@ -388,11 +389,11 @@ export class Layer {
       document.dispatchEvent(new Event("pushundo"));
       this.removeSelf();
       document.dispatchEvent(
-        new CustomEvent("processframe", {detail: {force: true}})
+        new CustomEvent("processframe", { detail: { force: true } }),
       );
     };
     layerTitle.appendChild(deleteLayerButton);
-    
+
     const renameLayerButton = document.createElement("button");
     renameLayerButton.style.display = "block";
     renameLayerButton.innerText = "Rename";
@@ -405,15 +406,15 @@ export class Layer {
       document.dispatchEvent(new CustomEvent("processframe"));
     };
     layerTitle.appendChild(renameLayerButton);
-    
+
     container.appendChild(layerTitle);
 
     if (!this.disabled) {
       if (this.structureVisible) {
         const structureDiv = document.createElement("div");
         structureDiv.classList.add("structure-structure-div");
-        this.structures = this.structures.filter(s => !s._removed);
-        this.structures.forEach(s => {
+        this.structures = this.structures.filter((s) => !s._removed);
+        this.structures.forEach((s) => {
           structureDiv.appendChild(s.renderDiv());
         });
         container.appendChild(structureDiv);
@@ -422,11 +423,10 @@ export class Layer {
       if (this.areaVisible) {
         const areasDiv = document.createElement("div");
         areasDiv.classList.add("structure-area-div");
-        Object.keys(this.areas).forEach(k => {
-          if (this.areas[k]._removed)
-            delete this.areas[k];
+        Object.keys(this.areas).forEach((k) => {
+          if (this.areas[k]._removed) delete this.areas[k];
         });
-        Object.keys(this.areas).forEach(id => {
+        Object.keys(this.areas).forEach((id) => {
           const area = this.areas[id];
           areasDiv.appendChild(area.renderDiv());
         });
@@ -450,8 +450,8 @@ export class Layer {
 
       const layersDiv = document.createElement("div");
       layersDiv.classList.add("structure-layers-div");
-      this.childLayers = this.childLayers.filter(l => !l._removed);
-      this.childLayers.forEach(l => {
+      this.childLayers = this.childLayers.filter((l) => !l._removed);
+      this.childLayers.forEach((l) => {
         layersDiv.appendChild(l.renderDiv());
       });
       container.appendChild(layersDiv);
@@ -474,7 +474,7 @@ export class Layer {
 
   /**
    * 구조체 추가
-   * @param {Structure} structure 
+   * @param {Structure} structure
    */
   addStructure(structure) {
     this.structures.push(structure);
@@ -491,7 +491,7 @@ export class Layer {
 
   /**
    * 영역 추가
-   * @param {Area} area 
+   * @param {Area} area
    */
   addArea(area) {
     this.areas[++this.lastId] = area;
@@ -501,14 +501,14 @@ export class Layer {
 
   /**
    * 자식 레이어 추가
-   * @param {Layer} layer 
+   * @param {Layer} layer
    */
   addChildLayer(layer) {
     this.childLayers.push(layer);
   }
 
   forRecursiveChildren(callback) {
-    this.childLayers.forEach(l => callback(l));
+    this.childLayers.forEach((l) => callback(l));
   }
 }
 
@@ -538,12 +538,16 @@ export class Project {
    * @returns {string}
    */
   stringify() {
-    return JSON.stringify(this, (key, value) => {
-      if (key.match(/^_.+/)) {
-        return undefined;
-      }
-      return value;
-    }, "\t").replace(/\t/g, "");
+    return JSON.stringify(
+      this,
+      (key, value) => {
+        if (key.match(/^_.+/)) {
+          return undefined;
+        }
+        return value;
+      },
+      "\t",
+    ).replace(/\t/g, "");
   }
 
   /**
@@ -589,7 +593,7 @@ export class Project {
  * @returns {Project}
  */
 export function parseProject(json) {
-  const data = typeof json === 'string' ? JSON.parse(json) : json;
+  const data = typeof json === "string" ? JSON.parse(json) : json;
 
   function parseArea(areaData) {
     const area = new Area(areaData.name, areaData.color);
@@ -599,13 +603,15 @@ export function parseProject(json) {
   function parseStructure(structureData) {
     return new Structure(
       structureData.startYear,
-      parseQuadtree(structureData.figure)
+      parseQuadtree(structureData.figure),
     );
   }
 
   function parseLayer(layerData) {
     const layer = new Layer(
-      layerData.name, layerData.unaffected, layerData.parentAreaIds
+      layerData.name,
+      layerData.unaffected,
+      layerData.parentAreaIds,
     );
     layer.lastId = layerData.lastId;
     layer.opacity = layerData.opacity;
@@ -636,4 +642,3 @@ export function parseProject(json) {
   const baseLayer = parseLayer(data.baseLayer);
   return new Project(data.name, baseLayer);
 }
-
