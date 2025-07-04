@@ -151,7 +151,7 @@ export class Structure {
    * @param {boolean} [force] - 강제로 다시 그릴지 여부
    * @returns {Structure}
    */
-  render(areas, canvas, context, camera, force = false) {
+  render(areas, canvas, context, camera, force) {
     if (this._rendered && !force) {
       const left =
         (camera.convertMapToScreenX(canvas, camera.dx) % camera.xZoom) -
@@ -224,7 +224,7 @@ export class Layer {
    * @param {boolean} force - 강제로 화면을 업데이트할지 결정
    * @returns {Layer}
    */
-  render(year, canvas, context, camera, force = false) {
+  render(year, canvas, context, camera, force) {
     if (this.disabled) return this;
 
     const structure = this.getStructure(year);
@@ -559,7 +559,7 @@ export class Project {
    * @param {boolean} force - 강제로 화면을 렌더할지 결정
    * @returns {Project}
    */
-  render(year, canvas, context, camera, force = false) {
+  render(year, canvas, context, camera, force) {
     this.baseLayer.render(year, canvas, context, camera, force);
   }
 

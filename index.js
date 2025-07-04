@@ -545,6 +545,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // projectStructureDiv
   projectStructureDiv = document.querySelector("#project-structure");
 
+  setTool(tools.span.id);
+
   // 한프레임 처리
   processFrame(true);
 });
@@ -580,12 +582,14 @@ function tick() {}
  * 프레임마다 혹은 이벤트 발생 시마다 실행됨
  * @param {boolean} [force] - 강제로 화면를 렌더할지 결정
  */
-function render(force = false) {
+function render(force) {
+  force = force !== undefined;
+
   // 배경 색 칠
-  ctx.fillStyle = "lightgrey";
+  ctx.fillStyle = "#808080";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "grey";
-  const transparentSize = 5 * window.devicePixelRatio;
+  ctx.fillStyle = "#909090";
+  const transparentSize = 10 * window.devicePixelRatio;
   for (let x = 0; x < canvas.width; x += transparentSize * 2)
     for (let y = 0; y < canvas.height; y += transparentSize * 2) {
       ctx.fillRect(x, y, transparentSize, transparentSize);
